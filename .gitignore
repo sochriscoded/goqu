@@ -1,0 +1,7 @@
+*.env
+CLAUDE.md
+checklist.md
+goqu/bin/Debug/*
+goqu/obj/Debug/*
+.idea/*
+goqu/obj/*
