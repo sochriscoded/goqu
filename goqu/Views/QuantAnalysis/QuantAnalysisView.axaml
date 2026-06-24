@@ -1,0 +1,793 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:local="clr-namespace:goqu.Views.QuantAnalysis"
+             x:Class="goqu.Views.QuantAnalysis.QuantAnalysisView"
+             Background="#060810">
+
+    <UserControl.Styles>
+        <Style Selector="Button.QTab">
+            <Setter Property="Background" Value="Transparent"/>
+            <Setter Property="Foreground" Value="#2A3A4A"/>
+            <Setter Property="BorderBrush" Value="Transparent"/>
+            <Setter Property="BorderThickness" Value="0,0,0,2"/>
+            <Setter Property="Padding" Value="16,0"/>
+            <Setter Property="FontSize" Value="10"/>
+            <Setter Property="FontWeight" Value="Bold"/>
+            <Setter Property="LetterSpacing" Value="0.5"/>
+            <Setter Property="CornerRadius" Value="0"/>
+            <Setter Property="Cursor" Value="Hand"/>
+            <Setter Property="Template">
+                <ControlTemplate>
+                    <Border Background="{TemplateBinding Background}"
+                            BorderBrush="{TemplateBinding BorderBrush}"
+                            BorderThickness="{TemplateBinding BorderThickness}"
+                            Padding="{TemplateBinding Padding}">
+                        <ContentPresenter Content="{TemplateBinding Content}"
+                                          HorizontalContentAlignment="Center"
+                                          VerticalContentAlignment="Center"
+                                          FontSize="{TemplateBinding FontSize}"
+                                          FontWeight="{TemplateBinding FontWeight}"
+                                          TextElement.Foreground="{TemplateBinding Foreground}"/>
+                    </Border>
+                </ControlTemplate>
+            </Setter>
+        </Style>
+        <Style Selector="Button.QTab.Active">
+            <Setter Property="Foreground" Value="#9D6CD4"/>
+            <Setter Property="BorderBrush" Value="#9D6CD4"/>
+        </Style>
+        <Style Selector="Button.QTab:pointerover">
+            <Setter Property="Foreground" Value="#6070A0"/>
+        </Style>
+
+        <Style Selector="TextBlock.SLabel">
+            <Setter Property="FontSize" Value="9"/>
+            <Setter Property="FontWeight" Value="Bold"/>
+            <Setter Property="Foreground" Value="#2A3240"/>
+            <Setter Property="LetterSpacing" Value="1"/>
+        </Style>
+
+        <Style Selector="TextBlock.BigStat">
+            <Setter Property="FontSize" Value="26"/>
+            <Setter Property="FontWeight" Value="Bold"/>
+            <Setter Property="Foreground" Value="#EBFFFF"/>
+        </Style>
+
+        <Style Selector="TextBlock.SubNote">
+            <Setter Property="FontSize" Value="10"/>
+            <Setter Property="Foreground" Value="#3A4A5A"/>
+        </Style>
+
+        <Style Selector="ListBoxItem">
+            <Setter Property="Padding" Value="0"/>
+            <Setter Property="Margin" Value="0"/>
+            <Setter Property="Background" Value="Transparent"/>
+            <Setter Property="Template">
+                <ControlTemplate>
+                    <Border Background="{TemplateBinding Background}"
+                            BorderBrush="#0A0D18" BorderThickness="0,0,0,1"
+                            Padding="0">
+                        <ContentPresenter Content="{TemplateBinding Content}"/>
+                    </Border>
+                </ControlTemplate>
+            </Setter>
+        </Style>
+        <Style Selector="ListBoxItem:pointerover /template/ Border">
+            <Setter Property="Background" Value="#0A0C18"/>
+        </Style>
+        <Style Selector="ListBoxItem:selected /template/ Border">
+            <Setter Property="Background" Value="#0D1020"/>
+        </Style>
+
+        <Style Selector="Button.RunBtn">
+            <Setter Property="Background" Value="#160E28"/>
+            <Setter Property="Foreground" Value="#9D6CD4"/>
+            <Setter Property="BorderBrush" Value="#3A2460"/>
+            <Setter Property="BorderThickness" Value="1"/>
+            <Setter Property="Padding" Value="16,8"/>
+            <Setter Property="FontSize" Value="11"/>
+            <Setter Property="FontWeight" Value="Bold"/>
+            <Setter Property="CornerRadius" Value="4"/>
+            <Setter Property="Cursor" Value="Hand"/>
+            <Setter Property="Template">
+                <ControlTemplate>
+                    <Border Background="{TemplateBinding Background}"
+                            BorderBrush="{TemplateBinding BorderBrush}"
+                            BorderThickness="{TemplateBinding BorderThickness}"
+                            CornerRadius="{TemplateBinding CornerRadius}"
+                            Padding="{TemplateBinding Padding}">
+                        <ContentPresenter Content="{TemplateBinding Content}"
+                                          HorizontalContentAlignment="Center"
+                                          VerticalContentAlignment="Center"
+                                          FontSize="{TemplateBinding FontSize}"
+                                          FontWeight="{TemplateBinding FontWeight}"
+                                          TextElement.Foreground="{TemplateBinding Foreground}"/>
+                    </Border>
+                </ControlTemplate>
+            </Setter>
+        </Style>
+        <Style Selector="Button.RunBtn:pointerover">
+            <Setter Property="Background" Value="#200E40"/>
+            <Setter Property="BorderBrush" Value="#9D6CD4"/>
+        </Style>
+    </UserControl.Styles>
+
+    <Grid RowDefinitions="54,1,44,1,*">
+
+        <!-- ══ Header ════════════════════════════════════════════════════════ -->
+        <Grid Grid.Row="0" ColumnDefinitions="Auto,*,Auto"
+              Background="#07080E" Margin="0,0,0,0">
+            <StackPanel Grid.Column="0" Orientation="Horizontal"
+                        Spacing="12" VerticalAlignment="Center"
+                        Margin="24,0,0,0">
+                <Border Width="4" Height="20" Background="#9D6CD4" CornerRadius="2"/>
+                <TextBlock Text="QUANTITATIVE ANALYSIS"
+                           FontSize="14" FontWeight="Bold"
+                           Foreground="#EBFFFF" VerticalAlignment="Center"/>
+                <TextBlock x:Name="TradeCountLabel"
+                           FontSize="11" Foreground="#2A3A4A"
+                           VerticalAlignment="Center"/>
+            </StackPanel>
+            <StackPanel Grid.Column="2" Orientation="Horizontal"
+                        Spacing="8" VerticalAlignment="Center"
+                        Margin="0,0,20,0">
+                <Button Classes="RunBtn" Content="REFRESH" Click="OnRefresh"/>
+            </StackPanel>
+        </Grid>
+
+        <Rectangle Grid.Row="1" Fill="#0E1020"/>
+
+        <!-- ══ Tab bar ════════════════════════════════════════════════════════ -->
+        <Border Grid.Row="2" Background="#06080E">
+            <StackPanel Orientation="Horizontal" Spacing="0"
+                        VerticalAlignment="Stretch">
+                <Button x:Name="TabSignificance"
+                        Classes="QTab Active"
+                        Content="EDGE SIGNIFICANCE"
+                        Tag="significance"
+                        Height="44"
+                        Click="OnTabClick"/>
+                <Button x:Name="TabBenchmark"
+                        Classes="QTab"
+                        Content="BENCHMARK"
+                        Tag="benchmark"
+                        Height="44"
+                        Click="OnTabClick"/>
+                <Button x:Name="TabMonteCarlo"
+                        Classes="QTab"
+                        Content="MONTE CARLO"
+                        Tag="montecarlo"
+                        Height="44"
+                        Click="OnTabClick"/>
+                <Button x:Name="TabCalibration"
+                        Classes="QTab"
+                        Content="CALIBRATION"
+                        Tag="calibration"
+                        Height="44"
+                        Click="OnTabClick"/>
+                <Button x:Name="TabBehavioral"
+                        Classes="QTab"
+                        Content="BEHAVIORAL"
+                        Tag="behavioral"
+                        Height="44"
+                        Click="OnTabClick"/>
+                <Button x:Name="TabConcentration"
+                        Classes="QTab"
+                        Content="CONCENTRATION"
+                        Tag="concentration"
+                        Height="44"
+                        Click="OnTabClick"/>
+            </StackPanel>
+        </Border>
+
+        <Rectangle Grid.Row="3" Fill="#0E1020"/>
+
+        <!-- ══ Tab content ════════════════════════════════════════════════════ -->
+        <ScrollViewer Grid.Row="4" HorizontalScrollBarVisibility="Disabled">
+            <Grid>
+
+                <!-- ── EDGE SIGNIFICANCE ─────────────────────────────────── -->
+                <StackPanel x:Name="SignificancePanel" Margin="28,24,28,28" Spacing="0">
+
+                    <!-- Need more data state -->
+                    <Border x:Name="SigNeedMoreData"
+                            Background="#08090E" BorderBrush="#141820"
+                            BorderThickness="1" CornerRadius="6"
+                            Padding="24,20" IsVisible="True">
+                        <StackPanel Spacing="10" HorizontalAlignment="Center">
+                            <TextBlock Text="NOT ENOUGH DATA" Classes="SLabel"
+                                       HorizontalAlignment="Center"/>
+                            <TextBlock FontSize="13" Foreground="#2A3A4A"
+                                       HorizontalAlignment="Center">
+                                Log at least 5 closed trades to see significance analysis.
+                            </TextBlock>
+                            <TextBlock FontSize="11" Foreground="#1A2430"
+                                       HorizontalAlignment="Center">
+                                Meaningful statistics require ≥ 30 closed trades.
+                            </TextBlock>
+                        </StackPanel>
+                    </Border>
+
+                    <!-- Main content -->
+                    <StackPanel x:Name="SigContent" IsVisible="False" Spacing="16">
+
+                        <!-- 4 KPI tiles -->
+                        <Grid ColumnDefinitions="*,12,*,12,*,12,*">
+                            <Border Grid.Column="0" Background="#08090E"
+                                    BorderBrush="#141820" BorderThickness="1"
+                                    CornerRadius="6" Padding="16,14">
+                                <StackPanel Spacing="4">
+                                    <TextBlock x:Name="SigWinRate" Classes="BigStat"/>
+                                    <TextBlock Text="WIN RATE" Classes="SLabel"/>
+                                    <TextBlock x:Name="SigWinRateCI" Classes="SubNote"/>
+                                </StackPanel>
+                            </Border>
+                            <Border Grid.Column="2" Background="#08090E"
+                                    BorderBrush="#141820" BorderThickness="1"
+                                    CornerRadius="6" Padding="16,14">
+                                <StackPanel Spacing="4">
+                                    <TextBlock x:Name="SigExpR" Classes="BigStat"/>
+                                    <TextBlock Text="EXPECTANCY R" Classes="SLabel"/>
+                                    <TextBlock x:Name="SigExpRNote" Classes="SubNote"/>
+                                </StackPanel>
+                            </Border>
+                            <Border Grid.Column="4" Background="#08090E"
+                                    BorderBrush="#141820" BorderThickness="1"
+                                    CornerRadius="6" Padding="16,14">
+                                <StackPanel Spacing="4">
+                                    <TextBlock x:Name="SigPF" Classes="BigStat"/>
+                                    <TextBlock Text="PROFIT FACTOR" Classes="SLabel"/>
+                                    <TextBlock Text="gross profit / gross loss" Classes="SubNote"/>
+                                </StackPanel>
+                            </Border>
+                            <Border Grid.Column="6" Background="#08090E"
+                                    BorderBrush="#141820" BorderThickness="1"
+                                    CornerRadius="6" Padding="16,14">
+                                <StackPanel Spacing="4">
+                                    <TextBlock x:Name="SigSampleN" Classes="BigStat"/>
+                                    <TextBlock Text="SAMPLE SIZE" Classes="SLabel"/>
+                                    <TextBlock x:Name="SigSampleAssess" Classes="SubNote"/>
+                                </StackPanel>
+                            </Border>
+                        </Grid>
+
+                        <!-- Verdict card -->
+                        <Border Background="#0C0A00" BorderBrush="#3A3000"
+                                BorderThickness="1" CornerRadius="6"
+                                Padding="18,14">
+                            <StackPanel Spacing="8">
+                                <StackPanel Orientation="Horizontal" Spacing="10">
+                                    <TextBlock x:Name="SigVerdictIcon"
+                                               FontSize="16" Foreground="#FFE101"
+                                               VerticalAlignment="Center"/>
+                                    <TextBlock x:Name="SigVerdictTitle"
+                                               FontSize="11" FontWeight="Bold"
+                                               VerticalAlignment="Center"/>
+                                </StackPanel>
+                                <TextBlock x:Name="SigVerdictBody"
+                                           FontSize="12" Foreground="#6070A0"
+                                           TextWrapping="Wrap" LineHeight="18"/>
+                            </StackPanel>
+                        </Border>
+
+                        <!-- Multiple testing reminder -->
+                        <Border Background="#08090E" BorderBrush="#141820"
+                                BorderThickness="1" CornerRadius="6"
+                                Padding="16,12">
+                            <TextBlock FontSize="11" Foreground="#3A4A5A"
+                                       TextWrapping="Wrap" LineHeight="17">
+                                <Run FontWeight="Bold" Text="Multiple testing: "/>
+                                <Run Text="If you reviewed many setups before landing on your current approach, apply a deflated Sharpe ratio or Bonferroni correction. A t-stat that looks significant after 20 tries is probably noise."/>
+                            </TextBlock>
+                        </Border>
+
+                    </StackPanel>
+                </StackPanel>
+
+                <!-- ── BENCHMARK COMPARISON ────────────────────────────────── -->
+                <StackPanel x:Name="BenchmarkPanel" IsVisible="False"
+                            Margin="28,24,28,28" Spacing="16">
+
+                    <StackPanel Spacing="4" Margin="0,0,0,4">
+                        <StackPanel Orientation="Horizontal" Spacing="10">
+                            <Border Width="4" Height="18" Background="#9D6CD4" CornerRadius="2"/>
+                            <TextBlock Text="BENCHMARK COMPARISON"
+                                       FontSize="16" FontWeight="Bold"
+                                       Foreground="#EBFFFF" VerticalAlignment="Center"/>
+                        </StackPanel>
+                        <TextBlock Text="your equity curve vs the S&amp;P 500"
+                                   FontSize="12" Foreground="#2A3A4A" Margin="14,0,0,0"/>
+                    </StackPanel>
+
+                    <!-- Data required notice -->
+                    <Border Background="#0A0A12" BorderBrush="#1A1A28"
+                            BorderThickness="1" CornerRadius="6"
+                            Padding="20,16">
+                        <StackPanel Spacing="10">
+                            <StackPanel Orientation="Horizontal" Spacing="8">
+                                <TextBlock Text="⊘" FontSize="16" Foreground="#2A3A4A"
+                                           VerticalAlignment="Center"/>
+                                <TextBlock Text="DATA LAYER REQUIRED"
+                                           FontSize="10" FontWeight="Bold"
+                                           Foreground="#2A3A4A" LetterSpacing="1"
+                                           VerticalAlignment="Center"/>
+                            </StackPanel>
+                            <TextBlock FontSize="12" Foreground="#4A5568"
+                                       TextWrapping="Wrap" LineHeight="18">
+                                Benchmark comparison requires SPY price data in the
+                                <Run FontWeight="Bold" Foreground="#6070A0">benchmark_price</Run>
+                                table. Populate it via the data ingestion layer to enable this analysis.
+                            </TextBlock>
+                        </StackPanel>
+                    </Border>
+
+                    <!-- What will appear here -->
+                    <Border Background="#08090E" BorderBrush="#141820"
+                            BorderThickness="1" CornerRadius="6"
+                            Padding="18,14">
+                        <StackPanel Spacing="14">
+                            <TextBlock Text="WHAT THIS TAB WILL SHOW" Classes="SLabel"/>
+                            <Grid ColumnDefinitions="*,16,*,16,*">
+                                <Border Grid.Column="0" Background="#060810"
+                                        BorderBrush="#0F1220" BorderThickness="1"
+                                        CornerRadius="4" Padding="12,10">
+                                    <StackPanel Spacing="4">
+                                        <TextBlock Text="—" FontSize="18" FontWeight="Bold"
+                                                   Foreground="#3A4A5A"/>
+                                        <TextBlock Text="ALPHA VS SPY" Classes="SLabel"/>
+                                        <TextBlock Text="annualized excess return" Classes="SubNote"/>
+                                    </StackPanel>
+                                </Border>
+                                <Border Grid.Column="2" Background="#060810"
+                                        BorderBrush="#0F1220" BorderThickness="1"
+                                        CornerRadius="4" Padding="12,10">
+                                    <StackPanel Spacing="4">
+                                        <TextBlock Text="—" FontSize="18" FontWeight="Bold"
+                                                   Foreground="#3A4A5A"/>
+                                        <TextBlock Text="BETA" Classes="SLabel"/>
+                                        <TextBlock Text="market correlation" Classes="SubNote"/>
+                                    </StackPanel>
+                                </Border>
+                                <Border Grid.Column="4" Background="#060810"
+                                        BorderBrush="#0F1220" BorderThickness="1"
+                                        CornerRadius="4" Padding="12,10">
+                                    <StackPanel Spacing="4">
+                                        <TextBlock Text="—" FontSize="18" FontWeight="Bold"
+                                                   Foreground="#3A4A5A"/>
+                                        <TextBlock Text="INFO RATIO" Classes="SLabel"/>
+                                        <TextBlock Text="alpha / tracking error" Classes="SubNote"/>
+                                    </StackPanel>
+                                </Border>
+                            </Grid>
+                            <TextBlock FontSize="11" Foreground="#1A2430" TextWrapping="Wrap">
+                                Equity curve chart · Rolling alpha chart · Correlation-adjusted performance attribution
+                            </TextBlock>
+                        </StackPanel>
+                    </Border>
+                </StackPanel>
+
+                <!-- ── MONTE CARLO ─────────────────────────────────────────── -->
+                <StackPanel x:Name="MonteCarloPanel" IsVisible="False"
+                            Margin="28,24,28,28" Spacing="16">
+
+                    <StackPanel Spacing="4" Margin="0,0,0,4">
+                        <StackPanel Orientation="Horizontal" Spacing="10">
+                            <Border Width="4" Height="18" Background="#9D6CD4" CornerRadius="2"/>
+                            <TextBlock Text="MONTE CARLO SIMULATION"
+                                       FontSize="16" FontWeight="Bold"
+                                       Foreground="#EBFFFF" VerticalAlignment="Center"/>
+                        </StackPanel>
+                        <TextBlock Text="simulate thousands of possible equity paths from your trade history"
+                                   FontSize="12" Foreground="#2A3A4A" Margin="14,0,0,0"/>
+                    </StackPanel>
+
+                    <!-- Controls -->
+                    <Border Background="#08090E" BorderBrush="#141820"
+                            BorderThickness="1" CornerRadius="6" Padding="18,14">
+                        <Grid ColumnDefinitions="Auto,12,120,12,Auto,*,Auto">
+                            <TextBlock Grid.Column="0"
+                                       Text="SIMULATIONS" Classes="SLabel"
+                                       VerticalAlignment="Center"/>
+                            <Border Grid.Column="2"
+                                    Background="#060810" BorderBrush="#141820"
+                                    BorderThickness="1" CornerRadius="4"
+                                    Padding="8,5">
+                                <TextBox x:Name="SimulationCount"
+                                         Text="1000"
+                                         Background="Transparent" BorderThickness="0"
+                                         Foreground="#EBFFFF" FontSize="12"
+                                         VerticalAlignment="Center"/>
+                            </Border>
+                            <TextBlock Grid.Column="4"
+                                       Text="trades/sim = your trade count"
+                                       FontSize="11" Foreground="#2A3A4A"
+                                       VerticalAlignment="Center"/>
+                            <Button Grid.Column="6" Classes="RunBtn"
+                                    Content="▶ RUN SIMULATION"
+                                    Click="OnRunSimulation"/>
+                        </Grid>
+                    </Border>
+
+                    <!-- Results placeholder -->
+                    <Border Background="#08090E" BorderBrush="#141820"
+                            BorderThickness="1" CornerRadius="6" Padding="18,14">
+                        <StackPanel Spacing="14">
+                            <TextBlock Text="SIMULATION RESULTS" Classes="SLabel"/>
+                            <Grid ColumnDefinitions="*,12,*,12,*,12,*">
+                                <Border Grid.Column="0" Background="#060810"
+                                        BorderBrush="#0F1220" BorderThickness="1"
+                                        CornerRadius="4" Padding="12,10">
+                                    <StackPanel Spacing="2">
+                                        <TextBlock x:Name="McMedian" Text="—"
+                                                   FontSize="18" FontWeight="Bold"
+                                                   Foreground="#9D6CD4"/>
+                                        <TextBlock Text="MEDIAN OUTCOME" Classes="SLabel"/>
+                                    </StackPanel>
+                                </Border>
+                                <Border Grid.Column="2" Background="#060810"
+                                        BorderBrush="#0F1220" BorderThickness="1"
+                                        CornerRadius="4" Padding="12,10">
+                                    <StackPanel Spacing="2">
+                                        <TextBlock x:Name="McP5" Text="—"
+                                                   FontSize="18" FontWeight="Bold"
+                                                   Foreground="#BF1B1B"/>
+                                        <TextBlock Text="5TH PERCENTILE" Classes="SLabel"/>
+                                    </StackPanel>
+                                </Border>
+                                <Border Grid.Column="4" Background="#060810"
+                                        BorderBrush="#0F1220" BorderThickness="1"
+                                        CornerRadius="4" Padding="12,10">
+                                    <StackPanel Spacing="2">
+                                        <TextBlock x:Name="McP95" Text="—"
+                                                   FontSize="18" FontWeight="Bold"
+                                                   Foreground="#038C4C"/>
+                                        <TextBlock Text="95TH PERCENTILE" Classes="SLabel"/>
+                                    </StackPanel>
+                                </Border>
+                                <Border Grid.Column="6" Background="#060810"
+                                        BorderBrush="#0F1220" BorderThickness="1"
+                                        CornerRadius="4" Padding="12,10">
+                                    <StackPanel Spacing="2">
+                                        <TextBlock x:Name="McRuin" Text="—"
+                                                   FontSize="18" FontWeight="Bold"
+                                                   Foreground="#BF1B1B"/>
+                                        <TextBlock Text="RISK OF RUIN (50%)" Classes="SLabel"/>
+                                    </StackPanel>
+                                </Border>
+                            </Grid>
+                            <TextBlock Text="Chart will render here once simulation runs (requires charting library)."
+                                       FontSize="11" Foreground="#1A2430"/>
+                        </StackPanel>
+                    </Border>
+
+                    <Border Background="#08090E" BorderBrush="#141820"
+                            BorderThickness="1" CornerRadius="6" Padding="16,12">
+                        <TextBlock FontSize="11" Foreground="#3A4A5A"
+                                   TextWrapping="Wrap" LineHeight="17">
+                            <Run FontWeight="Bold" Text="What this shows: "/>
+                            <Run Text="Each simulation resamples your actual closed trades in random order and traces an equity curve. The spread of outcomes reveals how much of your performance is due to sequencing luck vs systematic edge. A wide fan means high path dependency; a narrow fan means your edge is consistent."/>
+                        </TextBlock>
+                    </Border>
+                </StackPanel>
+
+                <!-- ── CALIBRATION ────────────────────────────────────────── -->
+                <StackPanel x:Name="CalibrationPanel" IsVisible="False"
+                            Margin="28,24,28,28" Spacing="16">
+
+                    <StackPanel Spacing="4" Margin="0,0,0,4">
+                        <StackPanel Orientation="Horizontal" Spacing="10">
+                            <Border Width="4" Height="18" Background="#9D6CD4" CornerRadius="2"/>
+                            <TextBlock Text="PREDICTION CALIBRATION"
+                                       FontSize="16" FontWeight="Bold"
+                                       Foreground="#EBFFFF" VerticalAlignment="Center"/>
+                        </StackPanel>
+                        <TextBlock Text="do your confidence estimates match your actual win rates?"
+                                   FontSize="12" Foreground="#2A3A4A" Margin="14,0,0,0"/>
+                    </StackPanel>
+
+                    <!-- Brier score strip -->
+                    <Grid ColumnDefinitions="*,16,*,16,*">
+                        <Border Grid.Column="0" Background="#08090E"
+                                BorderBrush="#141820" BorderThickness="1"
+                                CornerRadius="6" Padding="16,14">
+                            <StackPanel Spacing="4">
+                                <TextBlock x:Name="BrierScore" Text="—"
+                                           FontSize="22" FontWeight="Bold"
+                                           Foreground="#EBFFFF"/>
+                                <TextBlock Text="BRIER SCORE" Classes="SLabel"/>
+                                <TextBlock Text="0 = perfect  ·  0.25 = random" Classes="SubNote"/>
+                            </StackPanel>
+                        </Border>
+                        <Border Grid.Column="2" Background="#08090E"
+                                BorderBrush="#141820" BorderThickness="1"
+                                CornerRadius="6" Padding="16,14">
+                            <StackPanel Spacing="4">
+                                <TextBlock x:Name="CalibN" Text="—"
+                                           FontSize="22" FontWeight="Bold"
+                                           Foreground="#EBFFFF"/>
+                                <TextBlock Text="TRADES WITH CONFIDENCE" Classes="SLabel"/>
+                                <TextBlock Text="logged confidence_pct at entry" Classes="SubNote"/>
+                            </StackPanel>
+                        </Border>
+                        <Border Grid.Column="4" Background="#08090E"
+                                BorderBrush="#141820" BorderThickness="1"
+                                CornerRadius="6" Padding="16,14">
+                            <StackPanel Spacing="4">
+                                <TextBlock x:Name="CalibAssess" Text="—"
+                                           FontSize="22" FontWeight="Bold"
+                                           Foreground="#3A4A5A"/>
+                                <TextBlock Text="CALIBRATION ASSESSMENT" Classes="SLabel"/>
+                                <TextBlock Text="over/under-confident?" Classes="SubNote"/>
+                            </StackPanel>
+                        </Border>
+                    </Grid>
+
+                    <!-- Calibration table -->
+                    <Border Background="#08090E" BorderBrush="#141820"
+                            BorderThickness="1" CornerRadius="6" Padding="0">
+                        <StackPanel Spacing="0">
+                            <!-- Column headers -->
+                            <Grid ColumnDefinitions="80,60,60,100,*"
+                                  Margin="16,10,16,6">
+                                <TextBlock Grid.Column="0" Text="CONFIDENCE" Classes="SLabel"/>
+                                <TextBlock Grid.Column="1" Text="TRADES" Classes="SLabel"/>
+                                <TextBlock Grid.Column="2" Text="WINS" Classes="SLabel"/>
+                                <TextBlock Grid.Column="3" Text="ACTUAL RATE" Classes="SLabel"/>
+                                <TextBlock Grid.Column="4" Text="DEVIATION" Classes="SLabel"/>
+                            </Grid>
+                            <Rectangle Height="1" Fill="#141820"/>
+
+                            <!-- Empty state -->
+                            <Border x:Name="CalibrationEmpty" Padding="16,20">
+                              <StackPanel Spacing="6">
+                                <TextBlock Text="No calibration data yet."
+                                           FontSize="12" Foreground="#2A3240"/>
+                                <TextBlock FontSize="11" Foreground="#1A2430"
+                                           TextWrapping="Wrap">
+                                    Log your predicted confidence % (confidence_pct) at entry and mark thesis_correct at exit.
+                                </TextBlock>
+                              </StackPanel>
+                            </Border>
+
+                            <!-- Data rows -->
+                            <ListBox x:Name="CalibrationList"
+                                     Background="Transparent"
+                                     IsVisible="False">
+                                <ListBox.ItemTemplate>
+                                    <DataTemplate DataType="local:CalibrationRow">
+                                        <Grid ColumnDefinitions="80,60,60,100,*"
+                                              Margin="16,8,16,8">
+                                            <TextBlock Grid.Column="0"
+                                                       Text="{Binding Bucket}"
+                                                       FontSize="12" FontWeight="SemiBold"
+                                                       Foreground="#C8D8E8"/>
+                                            <TextBlock Grid.Column="1"
+                                                       Text="{Binding N}"
+                                                       FontSize="12" Foreground="#6070A0"/>
+                                            <TextBlock Grid.Column="2"
+                                                       Text="{Binding Wins}"
+                                                       FontSize="12" Foreground="#6070A0"/>
+                                            <TextBlock Grid.Column="3"
+                                                       Text="{Binding ActualRate}"
+                                                       FontSize="12" FontWeight="SemiBold"
+                                                       Foreground="{Binding RateColor}"/>
+                                            <TextBlock Grid.Column="4"
+                                                       Text="{Binding Deviation}"
+                                                       FontSize="12"
+                                                       Foreground="{Binding DeviationColor}"/>
+                                        </Grid>
+                                    </DataTemplate>
+                                </ListBox.ItemTemplate>
+                            </ListBox>
+                        </StackPanel>
+                    </Border>
+
+                    <Border Background="#08090E" BorderBrush="#141820"
+                            BorderThickness="1" CornerRadius="6" Padding="16,12">
+                        <TextBlock FontSize="11" Foreground="#3A4A5A"
+                                   TextWrapping="Wrap" LineHeight="17">
+                            <Run FontWeight="Bold" Text="Reading calibration: "/>
+                            <Run Text="A 60% confidence prediction should win ~60% of the time. Systematic deviation means you are over- or under-confident. The Brier score summarises this in a single number (lower is better; 0 = perfect; 0.25 = uninformative)."/>
+                        </TextBlock>
+                    </Border>
+                </StackPanel>
+
+                <!-- ── BEHAVIORAL ──────────────────────────────────────────── -->
+                <StackPanel x:Name="BehavioralPanel" IsVisible="False"
+                            Margin="28,24,28,28" Spacing="16">
+
+                    <StackPanel Spacing="4" Margin="0,0,0,4">
+                        <StackPanel Orientation="Horizontal" Spacing="10">
+                            <Border Width="4" Height="18" Background="#9D6CD4" CornerRadius="2"/>
+                            <TextBlock Text="BEHAVIORAL ANALYSIS"
+                                       FontSize="16" FontWeight="Bold"
+                                       Foreground="#EBFFFF" VerticalAlignment="Center"/>
+                        </StackPanel>
+                        <TextBlock Text="how does emotional state correlate with trading performance?"
+                                   FontSize="12" Foreground="#2A3A4A" Margin="14,0,0,0"/>
+                    </StackPanel>
+
+                    <!-- Emotional state table -->
+                    <Border Background="#08090E" BorderBrush="#141820"
+                            BorderThickness="1" CornerRadius="6" Padding="0">
+                        <StackPanel Spacing="0">
+                            <Grid ColumnDefinitions="130,60,90,*"
+                                  Margin="16,10,16,6">
+                                <TextBlock Grid.Column="0" Text="EMOTIONAL STATE" Classes="SLabel"/>
+                                <TextBlock Grid.Column="1" Text="TRADES" Classes="SLabel"/>
+                                <TextBlock Grid.Column="2" Text="WIN RATE" Classes="SLabel"/>
+                                <TextBlock Grid.Column="3" Text="AVG R" Classes="SLabel"/>
+                            </Grid>
+                            <Rectangle Height="1" Fill="#141820"/>
+
+                            <Border x:Name="BehavioralEmpty" Padding="16,20">
+                              <StackPanel Spacing="6">
+                                <TextBlock Text="No behavioral data yet."
+                                           FontSize="12" Foreground="#2A3240"/>
+                                <TextBlock FontSize="11" Foreground="#1A2430"
+                                           TextWrapping="Wrap">
+                                    Log emotional_state at trade entry to enable this analysis.
+                                </TextBlock>
+                              </StackPanel>
+                            </Border>
+
+                            <ListBox x:Name="BehavioralList"
+                                     Background="Transparent"
+                                     IsVisible="False">
+                                <ListBox.ItemTemplate>
+                                    <DataTemplate DataType="local:BehavioralRow">
+                                        <Grid ColumnDefinitions="130,60,90,*"
+                                              Margin="16,8,16,8">
+                                            <TextBlock Grid.Column="0"
+                                                       Text="{Binding EmotionalState}"
+                                                       FontSize="12" FontWeight="SemiBold"
+                                                       Foreground="{Binding StateColor}"/>
+                                            <TextBlock Grid.Column="1"
+                                                       Text="{Binding N}"
+                                                       FontSize="12" Foreground="#6070A0"/>
+                                            <TextBlock Grid.Column="2"
+                                                       Text="{Binding WinRate}"
+                                                       FontSize="12" Foreground="#8090A8"/>
+                                            <TextBlock Grid.Column="3"
+                                                       Text="{Binding AvgR}"
+                                                       FontSize="12" FontWeight="SemiBold"
+                                                       Foreground="{Binding AvgRColor}"/>
+                                        </Grid>
+                                    </DataTemplate>
+                                </ListBox.ItemTemplate>
+                            </ListBox>
+                        </StackPanel>
+                    </Border>
+
+                    <!-- Revenge trading scan -->
+                    <Border Background="#0C0A00" BorderBrush="#3A3000"
+                            BorderThickness="1" CornerRadius="6" Padding="18,14">
+                        <StackPanel Spacing="8">
+                            <StackPanel Orientation="Horizontal" Spacing="8">
+                                <TextBlock Text="⚠" FontSize="14" Foreground="#FFE101"
+                                           VerticalAlignment="Center"/>
+                                <TextBlock Text="REVENGE TRADING SCAN"
+                                           FontSize="10" FontWeight="Bold"
+                                           Foreground="#FFE101" LetterSpacing="1"
+                                           VerticalAlignment="Center"/>
+                            </StackPanel>
+                            <TextBlock x:Name="RevengeNote"
+                                       FontSize="12" Foreground="#8090A8"
+                                       TextWrapping="Wrap" LineHeight="18"
+                                       Text="No closed trades yet. Revenge trade detection compares P&amp;L of trades entered within 30 min of a loss vs your baseline expectancy."/>
+                        </StackPanel>
+                    </Border>
+
+                    <!-- Followed-plan correlation -->
+                    <Border Background="#08090E" BorderBrush="#141820"
+                            BorderThickness="1" CornerRadius="6" Padding="18,14">
+                        <StackPanel Spacing="10">
+                            <TextBlock Text="PLAN ADHERENCE" Classes="SLabel"/>
+                            <Grid ColumnDefinitions="*,16,*">
+                                <Border Grid.Column="0" Background="#040F08"
+                                        BorderBrush="#081A0C" BorderThickness="1"
+                                        CornerRadius="4" Padding="12,10">
+                                    <StackPanel Spacing="2">
+                                        <TextBlock x:Name="FollowedPlanR" Text="—"
+                                                   FontSize="18" FontWeight="Bold"
+                                                   Foreground="#038C4C"/>
+                                        <TextBlock Text="AVG R  ·  FOLLOWED PLAN" Classes="SLabel"/>
+                                    </StackPanel>
+                                </Border>
+                                <Border Grid.Column="2" Background="#100508"
+                                        BorderBrush="#200810" BorderThickness="1"
+                                        CornerRadius="4" Padding="12,10">
+                                    <StackPanel Spacing="2">
+                                        <TextBlock x:Name="BrokeRuleR" Text="—"
+                                                   FontSize="18" FontWeight="Bold"
+                                                   Foreground="#BF1B1B"/>
+                                        <TextBlock Text="AVG R  ·  BROKE PLAN" Classes="SLabel"/>
+                                    </StackPanel>
+                                </Border>
+                            </Grid>
+                        </StackPanel>
+                    </Border>
+                </StackPanel>
+
+                <!-- ── CONCENTRATION ────────────────────────────────────────── -->
+                <StackPanel x:Name="ConcentrationPanel" IsVisible="False"
+                            Margin="28,24,28,28" Spacing="16">
+
+                    <StackPanel Spacing="4" Margin="0,0,0,4">
+                        <StackPanel Orientation="Horizontal" Spacing="10">
+                            <Border Width="4" Height="18" Background="#9D6CD4" CornerRadius="2"/>
+                            <TextBlock Text="RISK CONCENTRATION"
+                                       FontSize="16" FontWeight="Bold"
+                                       Foreground="#EBFFFF" VerticalAlignment="Center"/>
+                        </StackPanel>
+                        <TextBlock Text="where is your risk concentrated across symbols and sectors?"
+                                   FontSize="12" Foreground="#2A3A4A" Margin="14,0,0,0"/>
+                    </StackPanel>
+
+                    <!-- Symbol table -->
+                    <Border Background="#08090E" BorderBrush="#141820"
+                            BorderThickness="1" CornerRadius="6" Padding="0">
+                        <StackPanel Spacing="0">
+                            <Grid ColumnDefinitions="90,90,70,*"
+                                  Margin="16,10,16,6">
+                                <TextBlock Grid.Column="0" Text="SYMBOL" Classes="SLabel"/>
+                                <TextBlock Grid.Column="1" Text="TOTAL RISK" Classes="SLabel"/>
+                                <TextBlock Grid.Column="2" Text="% OF TOTAL" Classes="SLabel"/>
+                                <TextBlock Grid.Column="3" Text="RISK LEVEL" Classes="SLabel"/>
+                            </Grid>
+                            <Rectangle Height="1" Fill="#141820"/>
+
+                            <Border x:Name="ConcentrationEmpty" Padding="16,20">
+                              <StackPanel Spacing="6">
+                                <TextBlock Text="No trade data yet."
+                                           FontSize="12" Foreground="#2A3240"/>
+                                <TextBlock FontSize="11" Foreground="#1A2430">
+                                    Log trades to see risk concentration by symbol.
+                                </TextBlock>
+                              </StackPanel>
+                            </Border>
+
+                            <ListBox x:Name="ConcentrationList"
+                                     Background="Transparent"
+                                     IsVisible="False">
+                                <ListBox.ItemTemplate>
+                                    <DataTemplate DataType="local:ConcentrationRow">
+                                        <Grid ColumnDefinitions="90,90,70,*"
+                                              Margin="16,8,16,8">
+                                            <TextBlock Grid.Column="0"
+                                                       Text="{Binding Label}"
+                                                       FontSize="12" FontWeight="SemiBold"
+                                                       Foreground="#C8D8E8"/>
+                                            <TextBlock Grid.Column="1"
+                                                       Text="{Binding Risk}"
+                                                       FontSize="12" Foreground="#6070A0"/>
+                                            <TextBlock Grid.Column="2"
+                                                       Text="{Binding PctOfTotal}"
+                                                       FontSize="12" FontWeight="SemiBold"
+                                                       Foreground="{Binding BarColor}"/>
+                                            <TextBlock Grid.Column="3"
+                                                       Text="{Binding RiskLabel}"
+                                                       FontSize="11"
+                                                       Foreground="{Binding BarColor}"/>
+                                        </Grid>
+                                    </DataTemplate>
+                                </ListBox.ItemTemplate>
+                            </ListBox>
+                        </StackPanel>
+                    </Border>
+
+                    <Border Background="#08090E" BorderBrush="#141820"
+                            BorderThickness="1" CornerRadius="6" Padding="16,12">
+                        <TextBlock FontSize="11" Foreground="#3A4A5A"
+                                   TextWrapping="Wrap" LineHeight="17">
+                            <Run FontWeight="Bold" Text="Correlation note: "/>
+                            <Run Text="Symbol-level risk sums assume zero correlation. Correlated names (same sector, same macro regime) amplify real risk beyond what the sum implies. Correlation-adjusted heat requires the price history table to be populated."/>
+                        </TextBlock>
+                    </Border>
+                </StackPanel>
+
+            </Grid>
+        </ScrollViewer>
+
+    </Grid>
+</UserControl>

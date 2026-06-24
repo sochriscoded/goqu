@@ -1,0 +1,161 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:local="clr-namespace:goqu.Views.Journal"
+             x:Class="goqu.Views.Journal.AnalyticsTab"
+             Background="#0A0A0A">
+
+    <ScrollViewer HorizontalScrollBarVisibility="Disabled">
+        <StackPanel Margin="24,20,24,24" Spacing="24">
+
+            <!-- Row 1: Three stat boxes -->
+            <Grid ColumnDefinitions="*,*,*">
+
+                <!-- Expectancy box -->
+                <Border Grid.Column="0" Background="#0E1016" CornerRadius="4" Padding="16,14" Margin="0,0,8,0">
+                    <StackPanel Spacing="10">
+                        <TextBlock Text="EXPECTANCY" FontSize="8" FontWeight="Bold" Foreground="#2A3040"/>
+                        <StackPanel Spacing="4">
+                            <StackPanel Orientation="Horizontal" Spacing="8">
+                                <TextBlock x:Name="ExpR" Text="—" FontSize="20" FontWeight="Bold" Foreground="#EBFFFF"/>
+                                <TextBlock Text="/ trade" FontSize="11" Foreground="#3A4252" VerticalAlignment="Center"/>
+                            </StackPanel>
+                            <TextBlock x:Name="ExpDollar" Text="" FontSize="11" Foreground="#4A5568"/>
+                        </StackPanel>
+                        <Rectangle Height="1" Fill="#141820"/>
+                        <Grid ColumnDefinitions="*,*">
+                            <StackPanel Grid.Column="0" Spacing="2">
+                                <TextBlock Text="PROFIT FACTOR" FontSize="8" Foreground="#2A3040"/>
+                                <TextBlock x:Name="PF" Text="—" FontSize="14" FontWeight="Bold" Foreground="#EBFFFF"/>
+                            </StackPanel>
+                            <StackPanel Grid.Column="1" Spacing="2">
+                                <TextBlock Text="HALF KELLY" FontSize="8" Foreground="#2A3040"/>
+                                <TextBlock x:Name="Kelly" Text="—" FontSize="14" FontWeight="Bold" Foreground="#FFE101"/>
+                            </StackPanel>
+                        </Grid>
+                    </StackPanel>
+                </Border>
+
+                <!-- Win/Loss box -->
+                <Border Grid.Column="1" Background="#0E1016" CornerRadius="4" Padding="16,14" Margin="0,0,8,0">
+                    <StackPanel Spacing="10">
+                        <TextBlock Text="WIN / LOSS" FontSize="8" FontWeight="Bold" Foreground="#2A3040"/>
+                        <StackPanel Orientation="Horizontal" Spacing="16">
+                            <StackPanel Spacing="2">
+                                <TextBlock Text="WIN RATE" FontSize="8" Foreground="#2A3040"/>
+                                <TextBlock x:Name="WR" Text="—" FontSize="20" FontWeight="Bold" Foreground="#038C4C"/>
+                            </StackPanel>
+                            <StackPanel Spacing="2">
+                                <TextBlock Text="N CLOSED" FontSize="8" Foreground="#2A3040"/>
+                                <TextBlock x:Name="NClosed" Text="0" FontSize="20" FontWeight="Bold" Foreground="#EBFFFF"/>
+                            </StackPanel>
+                        </StackPanel>
+                        <Rectangle Height="1" Fill="#141820"/>
+                        <Grid ColumnDefinitions="*,*">
+                            <StackPanel Grid.Column="0" Spacing="2">
+                                <TextBlock Text="AVG WIN" FontSize="8" Foreground="#2A3040"/>
+                                <TextBlock x:Name="AvgWin" Text="—" FontSize="14" FontWeight="Bold" Foreground="#038C4C"/>
+                            </StackPanel>
+                            <StackPanel Grid.Column="1" Spacing="2">
+                                <TextBlock Text="AVG LOSS" FontSize="8" Foreground="#2A3040"/>
+                                <TextBlock x:Name="AvgLoss" Text="—" FontSize="14" FontWeight="Bold" Foreground="#BF1B1B"/>
+                            </StackPanel>
+                        </Grid>
+                    </StackPanel>
+                </Border>
+
+                <!-- R Distribution mini bar chart -->
+                <Border Grid.Column="2" Background="#0E1016" CornerRadius="4" Padding="16,14">
+                    <StackPanel Spacing="8">
+                        <TextBlock Text="R DISTRIBUTION" FontSize="8" FontWeight="Bold" Foreground="#2A3040"/>
+                        <StackPanel x:Name="RDistPanel" Spacing="3"/>
+                        <TextBlock x:Name="RDistEmpty" Text="No closed trades."
+                                   FontSize="11" Foreground="#2A3040" IsVisible="False"/>
+                    </StackPanel>
+                </Border>
+            </Grid>
+
+            <!-- Row 2: By Emotion table -->
+            <StackPanel Spacing="8">
+                <TextBlock Text="PERFORMANCE BY EMOTIONAL STATE" FontSize="9" FontWeight="Bold" Foreground="#2A3040"/>
+                <Grid ColumnDefinitions="140,60,90,80,100">
+                    <TextBlock Grid.Column="0" Text="STATE"      FontSize="8" FontWeight="Bold" Foreground="#1E2830" Margin="4,0,0,0"/>
+                    <TextBlock Grid.Column="1" Text="N"          FontSize="8" FontWeight="Bold" Foreground="#1E2830"/>
+                    <TextBlock Grid.Column="2" Text="EXPECT R"   FontSize="8" FontWeight="Bold" Foreground="#1E2830"/>
+                    <TextBlock Grid.Column="3" Text="WIN RATE"   FontSize="8" FontWeight="Bold" Foreground="#1E2830"/>
+                    <TextBlock Grid.Column="4" Text="TOTAL P&amp;L" FontSize="8" FontWeight="Bold" Foreground="#1E2830"/>
+                </Grid>
+                <Rectangle Height="1" Fill="#141820"/>
+                <ListBox x:Name="EmotionList" Background="Transparent" BorderThickness="0">
+                    <ListBox.Styles>
+                        <Style Selector="ListBoxItem">
+                            <Setter Property="Padding" Value="0"/>
+                            <Setter Property="Background" Value="Transparent"/>
+                            <Setter Property="IsHitTestVisible" Value="False"/>
+                        </Style>
+                    </ListBox.Styles>
+                    <ListBox.ItemTemplate>
+                        <DataTemplate x:DataType="local:AnalyticsDisplayRow">
+                            <Grid ColumnDefinitions="140,60,90,80,100" Height="28">
+                                <TextBlock Grid.Column="0" Text="{Binding Label}"
+                                           FontSize="12" Foreground="#EBFFFF" VerticalAlignment="Center" Margin="4,0,0,0"/>
+                                <TextBlock Grid.Column="1" Text="{Binding NStr}"
+                                           FontSize="12" Foreground="#8090A0" VerticalAlignment="Center"/>
+                                <TextBlock Grid.Column="2" Text="{Binding ExpR}"
+                                           FontSize="12" FontWeight="SemiBold" Foreground="{Binding ExpRColor}"
+                                           VerticalAlignment="Center"/>
+                                <TextBlock Grid.Column="3" Text="{Binding WR}"
+                                           FontSize="12" Foreground="#EBFFFF" VerticalAlignment="Center"/>
+                                <TextBlock Grid.Column="4" Text="{Binding TotalPnl}"
+                                           FontSize="12" FontWeight="SemiBold" Foreground="{Binding PnlColor}"
+                                           VerticalAlignment="Center"/>
+                            </Grid>
+                        </DataTemplate>
+                    </ListBox.ItemTemplate>
+                </ListBox>
+                <TextBlock x:Name="EmotionEmpty" Text="No data yet." FontSize="11" Foreground="#2A3040" IsVisible="False"/>
+            </StackPanel>
+
+            <!-- Row 3: By Setup -->
+            <StackPanel Spacing="8">
+                <TextBlock Text="PERFORMANCE BY SETUP TAG" FontSize="9" FontWeight="Bold" Foreground="#2A3040"/>
+                <Grid ColumnDefinitions="160,60,90,80,100">
+                    <TextBlock Grid.Column="0" Text="SETUP"      FontSize="8" FontWeight="Bold" Foreground="#1E2830" Margin="4,0,0,0"/>
+                    <TextBlock Grid.Column="1" Text="N"          FontSize="8" FontWeight="Bold" Foreground="#1E2830"/>
+                    <TextBlock Grid.Column="2" Text="EXPECT R"   FontSize="8" FontWeight="Bold" Foreground="#1E2830"/>
+                    <TextBlock Grid.Column="3" Text="WIN RATE"   FontSize="8" FontWeight="Bold" Foreground="#1E2830"/>
+                    <TextBlock Grid.Column="4" Text="TOTAL P&amp;L" FontSize="8" FontWeight="Bold" Foreground="#1E2830"/>
+                </Grid>
+                <Rectangle Height="1" Fill="#141820"/>
+                <ListBox x:Name="SetupList" Background="Transparent" BorderThickness="0">
+                    <ListBox.Styles>
+                        <Style Selector="ListBoxItem">
+                            <Setter Property="Padding" Value="0"/>
+                            <Setter Property="Background" Value="Transparent"/>
+                            <Setter Property="IsHitTestVisible" Value="False"/>
+                        </Style>
+                    </ListBox.Styles>
+                    <ListBox.ItemTemplate>
+                        <DataTemplate x:DataType="local:AnalyticsDisplayRow">
+                            <Grid ColumnDefinitions="160,60,90,80,100" Height="28">
+                                <TextBlock Grid.Column="0" Text="{Binding Label}"
+                                           FontSize="12" Foreground="#EBFFFF" VerticalAlignment="Center" Margin="4,0,0,0"/>
+                                <TextBlock Grid.Column="1" Text="{Binding NStr}"
+                                           FontSize="12" Foreground="#8090A0" VerticalAlignment="Center"/>
+                                <TextBlock Grid.Column="2" Text="{Binding ExpR}"
+                                           FontSize="12" FontWeight="SemiBold" Foreground="{Binding ExpRColor}"
+                                           VerticalAlignment="Center"/>
+                                <TextBlock Grid.Column="3" Text="{Binding WR}"
+                                           FontSize="12" Foreground="#EBFFFF" VerticalAlignment="Center"/>
+                                <TextBlock Grid.Column="4" Text="{Binding TotalPnl}"
+                                           FontSize="12" FontWeight="SemiBold" Foreground="{Binding PnlColor}"
+                                           VerticalAlignment="Center"/>
+                            </Grid>
+                        </DataTemplate>
+                    </ListBox.ItemTemplate>
+                </ListBox>
+                <TextBlock x:Name="SetupEmpty" Text="No setup tags logged yet." FontSize="11" Foreground="#2A3040" IsVisible="False"/>
+            </StackPanel>
+
+        </StackPanel>
+    </ScrollViewer>
+</UserControl>

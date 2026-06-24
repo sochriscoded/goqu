@@ -1,0 +1,195 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:local="clr-namespace:goqu.Views.Journal"
+             x:Class="goqu.Views.Journal.OverviewTab"
+             Background="#0A0A0A">
+
+    <UserControl.Resources>
+        <SolidColorBrush x:Key="Green"  Color="#038C4C"/>
+        <SolidColorBrush x:Key="Red"    Color="#BF1B1B"/>
+        <SolidColorBrush x:Key="Yellow" Color="#FFE101"/>
+        <SolidColorBrush x:Key="Blue"   Color="#0085CD"/>
+        <SolidColorBrush x:Key="Dim"    Color="#3A4252"/>
+    </UserControl.Resources>
+
+    <ScrollViewer HorizontalScrollBarVisibility="Disabled">
+        <StackPanel Margin="24,20,24,24" Spacing="24">
+
+            <!-- KPI strip -->
+            <Grid ColumnDefinitions="*,*,*,*,*,*" HorizontalAlignment="Stretch">
+                <!-- N Trades -->
+                <Border Grid.Column="0" Background="#0E1016" CornerRadius="4" Padding="14,12" Margin="0,0,8,0">
+                    <StackPanel Spacing="4">
+                        <TextBlock Text="N TRADES" FontSize="8" FontWeight="Bold" Foreground="#3A4252"/>
+                        <TextBlock x:Name="StatNTrades" Text="0" FontSize="22" FontWeight="Bold" Foreground="#EBFFFF"/>
+                    </StackPanel>
+                </Border>
+                <!-- Win Rate -->
+                <Border Grid.Column="1" Background="#0E1016" CornerRadius="4" Padding="14,12" Margin="0,0,8,0">
+                    <StackPanel Spacing="4">
+                        <TextBlock Text="WIN RATE" FontSize="8" FontWeight="Bold" Foreground="#3A4252"/>
+                        <TextBlock x:Name="StatWinRate" Text="—" FontSize="22" FontWeight="Bold" Foreground="#EBFFFF"/>
+                    </StackPanel>
+                </Border>
+                <!-- Expectancy -->
+                <Border Grid.Column="2" Background="#0E1016" CornerRadius="4" Padding="14,12" Margin="0,0,8,0">
+                    <StackPanel Spacing="4">
+                        <TextBlock Text="EXPECTANCY" FontSize="8" FontWeight="Bold" Foreground="#3A4252"/>
+                        <TextBlock x:Name="StatExpectR" Text="—" FontSize="22" FontWeight="Bold" Foreground="#EBFFFF"/>
+                        <TextBlock x:Name="StatExpectDollar" Text="" FontSize="10" Foreground="#3A4252"/>
+                    </StackPanel>
+                </Border>
+                <!-- Profit Factor -->
+                <Border Grid.Column="3" Background="#0E1016" CornerRadius="4" Padding="14,12" Margin="0,0,8,0">
+                    <StackPanel Spacing="4">
+                        <TextBlock Text="PROFIT FACTOR" FontSize="8" FontWeight="Bold" Foreground="#3A4252"/>
+                        <TextBlock x:Name="StatPF" Text="—" FontSize="22" FontWeight="Bold" Foreground="#EBFFFF"/>
+                    </StackPanel>
+                </Border>
+                <!-- Max Drawdown -->
+                <Border Grid.Column="4" Background="#0E1016" CornerRadius="4" Padding="14,12" Margin="0,0,8,0">
+                    <StackPanel Spacing="4">
+                        <TextBlock Text="MAX DD" FontSize="8" FontWeight="Bold" Foreground="#3A4252"/>
+                        <TextBlock x:Name="StatMaxDD" Text="—" FontSize="22" FontWeight="Bold" Foreground="#BF1B1B"/>
+                    </StackPanel>
+                </Border>
+                <!-- Open Positions -->
+                <Border Grid.Column="5" Background="#0E1016" CornerRadius="4" Padding="14,12">
+                    <StackPanel Spacing="4">
+                        <TextBlock Text="OPEN POS" FontSize="8" FontWeight="Bold" Foreground="#3A4252"/>
+                        <TextBlock x:Name="StatOpenPos" Text="0" FontSize="22" FontWeight="Bold" Foreground="#0085CD"/>
+                        <TextBlock x:Name="StatOpenRisk" Text="" FontSize="10" Foreground="#3A4252"/>
+                    </StackPanel>
+                </Border>
+            </Grid>
+
+            <!-- Open Positions -->
+            <StackPanel Spacing="8">
+                <StackPanel Orientation="Horizontal" Spacing="10">
+                    <TextBlock Text="OPEN POSITIONS" FontSize="9" FontWeight="Bold" Foreground="#3A4252" VerticalAlignment="Center"/>
+                    <Border Background="#0085CD" CornerRadius="2" Padding="5,1">
+                        <TextBlock x:Name="OpenCountBadge" Text="0" FontSize="9" FontWeight="Bold" Foreground="#EBFFFF"/>
+                    </Border>
+                </StackPanel>
+
+                <!-- Open trades header -->
+                <Grid ColumnDefinitions="90,70,120,90,110,*" Margin="0,0,0,0">
+                    <TextBlock Grid.Column="0" Text="SYMBOL"    FontSize="8" FontWeight="Bold" Foreground="#2A3040" Margin="8,0,0,0"/>
+                    <TextBlock Grid.Column="1" Text="DIR"       FontSize="8" FontWeight="Bold" Foreground="#2A3040"/>
+                    <TextBlock Grid.Column="2" Text="STRATEGY"  FontSize="8" FontWeight="Bold" Foreground="#2A3040"/>
+                    <TextBlock Grid.Column="3" Text="RISK $"    FontSize="8" FontWeight="Bold" Foreground="#2A3040"/>
+                    <TextBlock Grid.Column="4" Text="OPENED"    FontSize="8" FontWeight="Bold" Foreground="#2A3040"/>
+                    <TextBlock Grid.Column="5" Text="THESIS"    FontSize="8" FontWeight="Bold" Foreground="#2A3040"/>
+                </Grid>
+                <Rectangle Height="1" Fill="#141820"/>
+
+                <ListBox x:Name="OpenList"
+                         Background="Transparent"
+                         BorderThickness="0"
+                         MaxHeight="200">
+                    <ListBox.Styles>
+                        <Style Selector="ListBoxItem">
+                            <Setter Property="Padding" Value="0"/>
+                            <Setter Property="Background" Value="Transparent"/>
+                        </Style>
+                        <Style Selector="ListBoxItem:selected /template/ ContentPresenter">
+                            <Setter Property="Background" Value="#141820"/>
+                        </Style>
+                    </ListBox.Styles>
+                    <ListBox.ItemTemplate>
+                        <DataTemplate x:DataType="local:OpenTradeRow">
+                            <Grid ColumnDefinitions="90,70,120,90,110,*" Height="32">
+                                <TextBlock Grid.Column="0" Text="{Binding Symbol}"
+                                           FontSize="13" FontWeight="SemiBold" Foreground="#EBFFFF"
+                                           VerticalAlignment="Center" Margin="8,0,0,0"/>
+                                <TextBlock Grid.Column="1" Text="{Binding DirGlyph}"
+                                           FontSize="13" FontWeight="Bold"
+                                           Foreground="{Binding DirColor}"
+                                           VerticalAlignment="Center"/>
+                                <TextBlock Grid.Column="2" Text="{Binding Strategy}"
+                                           FontSize="11" Foreground="#8090A0"
+                                           VerticalAlignment="Center" TextTrimming="CharacterEllipsis"/>
+                                <TextBlock Grid.Column="3" Text="{Binding Risk}"
+                                           FontSize="12" Foreground="#EBFFFF"
+                                           VerticalAlignment="Center"/>
+                                <TextBlock Grid.Column="4" Text="{Binding Opened}"
+                                           FontSize="11" Foreground="#8090A0"
+                                           VerticalAlignment="Center"/>
+                                <TextBlock Grid.Column="5" Text="{Binding Thesis}"
+                                           FontSize="11" Foreground="#6070A0"
+                                           VerticalAlignment="Center" TextTrimming="CharacterEllipsis"/>
+                            </Grid>
+                        </DataTemplate>
+                    </ListBox.ItemTemplate>
+                </ListBox>
+
+                <TextBlock x:Name="NoOpenMsg" Text="No open positions."
+                           FontSize="12" Foreground="#2A3040" Margin="8,4,0,0"
+                           IsVisible="False"/>
+            </StackPanel>
+
+            <!-- Recent Closed Trades -->
+            <StackPanel Spacing="8">
+                <TextBlock Text="RECENT CLOSED" FontSize="9" FontWeight="Bold" Foreground="#3A4252"/>
+
+                <Grid ColumnDefinitions="90,70,100,70,110,140,*">
+                    <TextBlock Grid.Column="0" Text="SYMBOL"     FontSize="8" FontWeight="Bold" Foreground="#2A3040" Margin="8,0,0,0"/>
+                    <TextBlock Grid.Column="1" Text="DIR"        FontSize="8" FontWeight="Bold" Foreground="#2A3040"/>
+                    <TextBlock Grid.Column="2" Text="P&amp;L"   FontSize="8" FontWeight="Bold" Foreground="#2A3040"/>
+                    <TextBlock Grid.Column="3" Text="R"          FontSize="8" FontWeight="Bold" Foreground="#2A3040"/>
+                    <TextBlock Grid.Column="4" Text="CLOSED"     FontSize="8" FontWeight="Bold" Foreground="#2A3040"/>
+                    <TextBlock Grid.Column="5" Text="EXIT REASON" FontSize="8" FontWeight="Bold" Foreground="#2A3040"/>
+                    <TextBlock Grid.Column="6" Text="THESIS"     FontSize="8" FontWeight="Bold" Foreground="#2A3040"/>
+                </Grid>
+                <Rectangle Height="1" Fill="#141820"/>
+
+                <ListBox x:Name="ClosedList"
+                         Background="Transparent"
+                         BorderThickness="0"
+                         MaxHeight="280">
+                    <ListBox.Styles>
+                        <Style Selector="ListBoxItem">
+                            <Setter Property="Padding" Value="0"/>
+                            <Setter Property="Background" Value="Transparent"/>
+                        </Style>
+                        <Style Selector="ListBoxItem:selected /template/ ContentPresenter">
+                            <Setter Property="Background" Value="#141820"/>
+                        </Style>
+                    </ListBox.Styles>
+                    <ListBox.ItemTemplate>
+                        <DataTemplate x:DataType="local:ClosedTradeRow">
+                            <Grid ColumnDefinitions="90,70,100,70,110,140,*" Height="30">
+                                <TextBlock Grid.Column="0" Text="{Binding Symbol}"
+                                           FontSize="13" FontWeight="SemiBold" Foreground="#EBFFFF"
+                                           VerticalAlignment="Center" Margin="8,0,0,0"/>
+                                <TextBlock Grid.Column="1" Text="{Binding DirGlyph}"
+                                           FontSize="13" FontWeight="Bold" Foreground="{Binding DirColor}"
+                                           VerticalAlignment="Center"/>
+                                <TextBlock Grid.Column="2" Text="{Binding Pnl}"
+                                           FontSize="12" FontWeight="SemiBold" Foreground="{Binding PnlColor}"
+                                           VerticalAlignment="Center"/>
+                                <TextBlock Grid.Column="3" Text="{Binding R}"
+                                           FontSize="12" FontWeight="SemiBold" Foreground="{Binding RColor}"
+                                           VerticalAlignment="Center"/>
+                                <TextBlock Grid.Column="4" Text="{Binding Closed}"
+                                           FontSize="11" Foreground="#8090A0"
+                                           VerticalAlignment="Center"/>
+                                <TextBlock Grid.Column="5" Text="{Binding ExitReason}"
+                                           FontSize="11" Foreground="#6070A0"
+                                           VerticalAlignment="Center" TextTrimming="CharacterEllipsis"/>
+                                <TextBlock Grid.Column="6" Text="{Binding Thesis}"
+                                           FontSize="11" Foreground="#4A5568"
+                                           VerticalAlignment="Center" TextTrimming="CharacterEllipsis"/>
+                            </Grid>
+                        </DataTemplate>
+                    </ListBox.ItemTemplate>
+                </ListBox>
+
+                <TextBlock x:Name="NoClosedMsg" Text="No closed trades yet."
+                           FontSize="12" Foreground="#2A3040" Margin="8,4,0,0"
+                           IsVisible="False"/>
+            </StackPanel>
+
+        </StackPanel>
+    </ScrollViewer>
+</UserControl>

@@ -1,0 +1,125 @@
+<Window xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        x:Class="goqu.Views.Journal.CloseTradeWindow"
+        Title="Close Trade"
+        Background="#0A0A0A"
+        Width="480" Height="480"
+        WindowStartupLocation="CenterOwner"
+        CanResize="False">
+
+    <Window.Styles>
+        <Style Selector="TextBlock.Label">
+            <Setter Property="FontSize" Value="9"/>
+            <Setter Property="FontWeight" Value="Bold"/>
+            <Setter Property="Foreground" Value="#3A4252"/>
+        </Style>
+    </Window.Styles>
+
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="3"/>
+            <RowDefinition Height="*"/>
+            <RowDefinition Height="1"/>
+            <RowDefinition Height="54"/>
+        </Grid.RowDefinitions>
+
+        <Rectangle Grid.Row="0" Fill="#BF1B1B"/>
+
+        <StackPanel Grid.Row="1" Margin="24,20,24,0" Spacing="16">
+
+            <!-- Trade being closed -->
+            <StackPanel Spacing="4">
+                <TextBlock Text="CLOSING TRADE" FontSize="9" FontWeight="Bold" Foreground="#3A4252"/>
+                <TextBlock x:Name="TradeSummary" Text=""
+                           FontSize="18" FontWeight="Bold" Foreground="#EBFFFF"/>
+            </StackPanel>
+
+            <Rectangle Height="1" Fill="#141820"/>
+
+            <!-- Exit price + fees -->
+            <Grid ColumnDefinitions="*,12,*">
+                <StackPanel Grid.Column="0" Spacing="5">
+                    <TextBlock Text="EXIT PRICE $" Classes="Label"/>
+                    <TextBox x:Name="ExitPriceInput" PlaceholderText="e.g. 47.25"
+                             FontSize="16" FontWeight="Bold" Padding="10,8"/>
+                </StackPanel>
+                <StackPanel Grid.Column="2" Spacing="5">
+                    <TextBlock Text="EXIT FEES $" Classes="Label"/>
+                    <TextBox x:Name="ExitFeesInput" Text="0"
+                             FontSize="14" Padding="10,8"/>
+                </StackPanel>
+            </Grid>
+
+            <!-- Exit reason -->
+            <StackPanel Spacing="5">
+                <TextBlock Text="EXIT REASON" Classes="Label"/>
+                <ComboBox x:Name="ExitReasonBox" SelectedIndex="0"
+                          HorizontalAlignment="Stretch" FontSize="13">
+                    <ComboBoxItem Content="target_hit"/>
+                    <ComboBoxItem Content="stop_hit"/>
+                    <ComboBoxItem Content="time_stop"/>
+                    <ComboBoxItem Content="thesis_invalidated"/>
+                    <ComboBoxItem Content="thesis_wrong_timing"/>
+                    <ComboBoxItem Content="discretionary_profit_take"/>
+                    <ComboBoxItem Content="discretionary_panic"/>
+                    <ComboBoxItem Content="mis_sized"/>
+                    <ComboBoxItem Content="regime_shift"/>
+                    <ComboBoxItem Content="exogenous_shock"/>
+                    <ComboBoxItem Content="rolled"/>
+                    <ComboBoxItem Content="expired"/>
+                    <ComboBoxItem Content="assigned"/>
+                </ComboBox>
+            </StackPanel>
+
+            <!-- Did you follow your plan? + Was thesis correct? -->
+            <Grid ColumnDefinitions="*,12,*">
+                <StackPanel Grid.Column="0" Spacing="5">
+                    <TextBlock Text="FOLLOWED PLAN?" Classes="Label"/>
+                    <ComboBox x:Name="FollowedPlanBox" SelectedIndex="0"
+                              HorizontalAlignment="Stretch" FontSize="13">
+                        <ComboBoxItem Content="Yes"/>
+                        <ComboBoxItem Content="No"/>
+                    </ComboBox>
+                </StackPanel>
+                <StackPanel Grid.Column="2" Spacing="5">
+                    <TextBlock Text="THESIS CORRECT?" Classes="Label"/>
+                    <ComboBox x:Name="ThesisCorrectBox" SelectedIndex="2"
+                              HorizontalAlignment="Stretch" FontSize="13">
+                        <ComboBoxItem Content="Yes"/>
+                        <ComboBoxItem Content="No"/>
+                        <ComboBoxItem Content="(skip)"/>
+                    </ComboBox>
+                </StackPanel>
+            </Grid>
+
+            <!-- Notes -->
+            <StackPanel Spacing="5">
+                <TextBlock Text="NOTES (optional)" Classes="Label"/>
+                <TextBox x:Name="NotesInput"
+                         PlaceholderText="e.g. held through earnings, cut early due to regime shift..."
+                         TextWrapping="Wrap" AcceptsReturn="True"
+                         Height="52" FontSize="12" Padding="10,8"/>
+            </StackPanel>
+
+            <TextBlock x:Name="ErrorMsg" Text="" Foreground="#BF1B1B"
+                       FontSize="12" TextWrapping="Wrap" IsVisible="False"/>
+        </StackPanel>
+
+        <Rectangle Grid.Row="2" Fill="#141820"/>
+
+        <Grid Grid.Row="3" ColumnDefinitions="*,Auto,12,Auto" Margin="24,0">
+            <Button Grid.Column="1"
+                    Content="CANCEL"
+                    Background="#111620" Foreground="#4A5568"
+                    FontSize="11" FontWeight="Bold"
+                    Width="90" Height="34" CornerRadius="3"
+                    Cursor="Hand" Click="OnCancel"/>
+            <Button Grid.Column="3"
+                    Content="CLOSE TRADE"
+                    Background="#BF1B1B" Foreground="#EBFFFF"
+                    FontSize="12" FontWeight="Bold"
+                    Width="130" Height="34" CornerRadius="3"
+                    Cursor="Hand" Click="OnClose"/>
+        </Grid>
+    </Grid>
+</Window>

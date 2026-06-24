@@ -1,0 +1,342 @@
+<Window xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        x:Class="goqu.Views.Journal.NewTradeWindow"
+        Title="Log New Trade"
+        Background="#0A0A0A"
+        Width="620" MinHeight="700"
+        WindowStartupLocation="CenterOwner"
+        CanResize="True">
+
+    <Window.Styles>
+        <Style Selector="TextBlock.Label">
+            <Setter Property="FontSize" Value="9"/>
+            <Setter Property="FontWeight" Value="Bold"/>
+            <Setter Property="Foreground" Value="#3A4252"/>
+        </Style>
+        <Style Selector="Border.Section">
+            <Setter Property="Background" Value="#0E1016"/>
+            <Setter Property="CornerRadius" Value="4"/>
+            <Setter Property="Padding" Value="16,14"/>
+        </Style>
+        <Style Selector="Button.Dir">
+            <Setter Property="FontSize" Value="12"/>
+            <Setter Property="FontWeight" Value="Bold"/>
+            <Setter Property="Width" Value="90"/>
+            <Setter Property="Height" Value="34"/>
+            <Setter Property="HorizontalContentAlignment" Value="Center"/>
+            <Setter Property="VerticalContentAlignment" Value="Center"/>
+            <Setter Property="CornerRadius" Value="3"/>
+            <Setter Property="BorderThickness" Value="1"/>
+            <Setter Property="Cursor" Value="Hand"/>
+            <Setter Property="BorderBrush" Value="#222A36"/>
+            <Setter Property="Background" Value="#111620"/>
+            <Setter Property="Foreground" Value="#4A5568"/>
+            <Setter Property="Template">
+                <ControlTemplate>
+                    <Border Background="{TemplateBinding Background}"
+                            CornerRadius="{TemplateBinding CornerRadius}"
+                            BorderBrush="{TemplateBinding BorderBrush}"
+                            BorderThickness="{TemplateBinding BorderThickness}"
+                            Padding="{TemplateBinding Padding}">
+                        <ContentPresenter Content="{TemplateBinding Content}"
+                                          HorizontalAlignment="Center" VerticalAlignment="Center"
+                                          TextElement.FontWeight="{TemplateBinding FontWeight}"
+                                          TextElement.FontSize="{TemplateBinding FontSize}"
+                                          TextElement.Foreground="{TemplateBinding Foreground}"/>
+                    </Border>
+                </ControlTemplate>
+            </Setter>
+        </Style>
+        <Style Selector="Button.Dir.Selected">
+            <Setter Property="BorderBrush" Value="#038C4C"/>
+            <Setter Property="Background" Value="#0A1F14"/>
+            <Setter Property="Foreground" Value="#038C4C"/>
+        </Style>
+    </Window.Styles>
+
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="3"/>
+            <RowDefinition Height="*"/>
+            <RowDefinition Height="1"/>
+            <RowDefinition Height="54"/>
+        </Grid.RowDefinitions>
+
+        <Rectangle Grid.Row="0" Fill="#038C4C"/>
+
+        <ScrollViewer Grid.Row="1" HorizontalScrollBarVisibility="Disabled">
+            <StackPanel Margin="24,20,24,8" Spacing="12">
+
+                <!-- Symbol + Direction (prominent) -->
+                <Border Classes="Section">
+                    <Grid ColumnDefinitions="*,Auto" RowDefinitions="Auto,12,Auto,12,Auto">
+                        <TextBlock Grid.Row="0" Grid.ColumnSpan="2"
+                                   Text="POSITION" Classes="Label"/>
+
+                        <!-- Symbol -->
+                        <StackPanel Grid.Row="2" Grid.Column="0" Spacing="5" Margin="0,0,12,0">
+                            <TextBlock Text="SYMBOL" Classes="Label"/>
+                            <TextBox x:Name="SymbolInput"
+                                     PlaceholderText="e.g. AAPL, SPY"
+                                     FontSize="20" FontWeight="Bold"
+                                     Padding="10,8"/>
+                        </StackPanel>
+
+                        <!-- Entry Date -->
+                        <StackPanel Grid.Row="2" Grid.Column="1" Spacing="5">
+                            <TextBlock Text="ENTRY DATE" Classes="Label"/>
+                            <TextBox x:Name="EntryDateInput"
+                                     FontSize="13" Width="120"
+                                     Padding="10,8"/>
+                        </StackPanel>
+
+                        <!-- Direction buttons -->
+                        <StackPanel Grid.Row="4" Grid.ColumnSpan="2" Orientation="Horizontal" Spacing="8">
+                            <Button x:Name="DirLong"    Classes="Dir Selected" Content="↑  LONG"    Click="OnDirClick"/>
+                            <Button x:Name="DirShort"   Classes="Dir"          Content="↓  SHORT"   Click="OnDirClick"/>
+                            <Button x:Name="DirNeutral" Classes="Dir"          Content="→  NEUTRAL" Click="OnDirClick"/>
+                            <ComboBox x:Name="InstrumentBox" SelectedIndex="0"
+                                      FontSize="12" Height="34" MinWidth="110" Margin="8,0,0,0">
+                                <ComboBoxItem Content="equity"/>
+                                <ComboBoxItem Content="option"/>
+                                <ComboBoxItem Content="etf"/>
+                                <ComboBoxItem Content="future"/>
+                                <ComboBoxItem Content="other"/>
+                            </ComboBox>
+                            <ComboBox x:Name="SourceBox" SelectedIndex="0"
+                                      FontSize="12" Height="34" MinWidth="120">
+                                <ComboBoxItem Content="discretionary"/>
+                                <ComboBoxItem Content="screener"/>
+                                <ComboBoxItem Content="research"/>
+                                <ComboBoxItem Content="tip"/>
+                                <ComboBoxItem Content="other"/>
+                            </ComboBox>
+                        </StackPanel>
+                    </Grid>
+                </Border>
+
+                <!-- Strategy + Behavior row -->
+                <Grid ColumnDefinitions="*,10,*">
+                    <Border Grid.Column="0" Classes="Section">
+                        <StackPanel Spacing="10">
+                            <TextBlock Text="STRATEGY TYPE" Classes="Label"/>
+                            <TextBox x:Name="StrategyInput" PlaceholderText="e.g. long_equity, vertical, csp"
+                                     FontSize="12" Padding="10,7"/>
+                            <StackPanel Orientation="Horizontal" Spacing="8">
+                                <StackPanel Spacing="4" Width="130">
+                                    <TextBlock Text="EMOTIONAL STATE" Classes="Label"/>
+                                    <ComboBox x:Name="EmotionBox" SelectedIndex="0" FontSize="12" HorizontalAlignment="Stretch">
+                                        <ComboBoxItem Content="calm"/>
+                                        <ComboBoxItem Content="confident"/>
+                                        <ComboBoxItem Content="fomo"/>
+                                        <ComboBoxItem Content="revenge"/>
+                                        <ComboBoxItem Content="bored"/>
+                                        <ComboBoxItem Content="anxious"/>
+                                        <ComboBoxItem Content="fearful"/>
+                                    </ComboBox>
+                                </StackPanel>
+                                <StackPanel Spacing="4" Width="110">
+                                    <TextBlock Text="TRADE ORIGIN" Classes="Label"/>
+                                    <ComboBox x:Name="OriginBox" SelectedIndex="0" FontSize="12" HorizontalAlignment="Stretch">
+                                        <ComboBoxItem Content="planned"/>
+                                        <ComboBoxItem Content="impulsive"/>
+                                    </ComboBox>
+                                </StackPanel>
+                            </StackPanel>
+                        </StackPanel>
+                    </Border>
+
+                    <!-- Sizing -->
+                    <Border Grid.Column="2" Classes="Section">
+                        <StackPanel Spacing="10">
+                            <TextBlock Text="SIZING &amp; RISK" Classes="Label"/>
+                            <Grid ColumnDefinitions="*,8,*" RowDefinitions="Auto,8,Auto">
+                                <StackPanel Grid.Row="0" Grid.Column="0" Spacing="4">
+                                    <TextBlock Text="INITIAL RISK $" Classes="Label"/>
+                                    <TextBox x:Name="RiskInput" PlaceholderText="200"
+                                             FontSize="13" FontWeight="Bold" Padding="10,7"/>
+                                </StackPanel>
+                                <StackPanel Grid.Row="0" Grid.Column="2" Spacing="4">
+                                    <TextBlock Text="ACCOUNT VALUE $" Classes="Label"/>
+                                    <TextBox x:Name="AcctValueInput" PlaceholderText="optional"
+                                             FontSize="13" Padding="10,7"/>
+                                </StackPanel>
+                                <StackPanel Grid.Row="2" Grid.Column="0" Spacing="4">
+                                    <TextBlock Text="PLANNED STOP $" Classes="Label"/>
+                                    <TextBox x:Name="StopInput" PlaceholderText="optional"
+                                             FontSize="12" Padding="10,7"/>
+                                </StackPanel>
+                                <StackPanel Grid.Row="2" Grid.Column="2" Spacing="4">
+                                    <TextBlock Text="PLANNED TARGET $" Classes="Label"/>
+                                    <TextBox x:Name="TargetInput" PlaceholderText="optional"
+                                             FontSize="12" Padding="10,7"/>
+                                </StackPanel>
+                            </Grid>
+                        </StackPanel>
+                    </Border>
+                </Grid>
+
+                <!-- Entry Prediction -->
+                <Border Classes="Section">
+                    <StackPanel Spacing="10">
+                        <TextBlock Text="ENTRY PREDICTION" Classes="Label"/>
+                        <StackPanel Spacing="5">
+                            <TextBlock Text="THESIS — the specific, falsifiable reason you're in this trade" Classes="Label"/>
+                            <TextBox x:Name="ThesisInput"
+                                     PlaceholderText="e.g. Oversold bounce into earnings; AI capex tailwind underpriced at current multiple"
+                                     TextWrapping="Wrap"
+                                     AcceptsReturn="True"
+                                     Height="60"
+                                     FontSize="12"
+                                     Padding="10,8"/>
+                        </StackPanel>
+                        <Grid ColumnDefinitions="*,10,*">
+                            <StackPanel Grid.Column="0" Spacing="5">
+                                <TextBlock Text="CONFIDENCE % (0–100)" Classes="Label"/>
+                                <TextBox x:Name="ConfidenceInput" PlaceholderText="65"
+                                         FontSize="13" FontWeight="Bold" Padding="10,7"/>
+                            </StackPanel>
+                            <StackPanel Grid.Column="2" Spacing="5">
+                                <TextBlock Text="PLANNED HOLD DAYS" Classes="Label"/>
+                                <TextBox x:Name="HoldDaysInput" PlaceholderText="optional"
+                                         FontSize="13" Padding="10,7"/>
+                            </StackPanel>
+                        </Grid>
+                        <StackPanel Spacing="5">
+                            <TextBlock Text="INVALIDATION — what would prove the thesis wrong" Classes="Label"/>
+                            <TextBox x:Name="InvalidationInput"
+                                     PlaceholderText="e.g. Close below $38.00 on volume"
+                                     FontSize="12" Padding="10,7"/>
+                        </StackPanel>
+                    </StackPanel>
+                </Border>
+
+                <!-- Leg / Position Details -->
+                <Border Classes="Section">
+                    <StackPanel Spacing="10">
+                        <TextBlock Text="POSITION DETAILS (LEG 1)" Classes="Label"/>
+                        <Grid ColumnDefinitions="*,8,*,8,*,8,*">
+                            <StackPanel Grid.Column="0" Spacing="4">
+                                <TextBlock Text="QTY / CONTRACTS" Classes="Label"/>
+                                <TextBox x:Name="QtyInput" PlaceholderText="100"
+                                         FontSize="13" FontWeight="Bold" Padding="10,7"/>
+                            </StackPanel>
+                            <StackPanel Grid.Column="2" Spacing="4">
+                                <TextBlock Text="ENTRY PRICE $" Classes="Label"/>
+                                <TextBox x:Name="EntryPriceInput" PlaceholderText="42.50"
+                                         FontSize="13" FontWeight="Bold" Padding="10,7"/>
+                            </StackPanel>
+                            <StackPanel Grid.Column="4" Spacing="4">
+                                <TextBlock Text="ENTRY FEES $" Classes="Label"/>
+                                <TextBox x:Name="EntryFeesInput" PlaceholderText="0.00"
+                                         FontSize="12" Padding="10,7"/>
+                            </StackPanel>
+                            <StackPanel Grid.Column="6" Spacing="4">
+                                <TextBlock Text="MULTIPLIER" Classes="Label"/>
+                                <TextBox x:Name="MultiplierInput" PlaceholderText="1"
+                                         FontSize="12" Padding="10,7"/>
+                            </StackPanel>
+                        </Grid>
+                        <!-- Options extras -->
+                        <Grid ColumnDefinitions="*,8,*,8,*,8,*">
+                            <StackPanel Grid.Column="0" Spacing="4">
+                                <TextBlock Text="STRIKE (opt)" Classes="Label"/>
+                                <TextBox x:Name="StrikeInput" PlaceholderText="—" FontSize="12" Padding="10,7"/>
+                            </StackPanel>
+                            <StackPanel Grid.Column="2" Spacing="4">
+                                <TextBlock Text="EXPIRY (opt)" Classes="Label"/>
+                                <TextBox x:Name="ExpiryInput" PlaceholderText="YYYY-MM-DD" FontSize="12" Padding="10,7"/>
+                            </StackPanel>
+                            <StackPanel Grid.Column="4" Spacing="4">
+                                <TextBlock Text="DTE (opt)" Classes="Label"/>
+                                <TextBox x:Name="DteInput" PlaceholderText="—" FontSize="12" Padding="10,7"/>
+                            </StackPanel>
+                            <StackPanel Grid.Column="6" Spacing="4">
+                                <TextBlock Text="DELTA (opt)" Classes="Label"/>
+                                <TextBox x:Name="DeltaInput" PlaceholderText="—" FontSize="12" Padding="10,7"/>
+                            </StackPanel>
+                        </Grid>
+                    </StackPanel>
+                </Border>
+
+                <!-- Market state -->
+                <Border Classes="Section">
+                    <StackPanel Spacing="10">
+                        <TextBlock Text="MARKET STATE AT ENTRY" Classes="Label"/>
+                        <Grid ColumnDefinitions="*,8,*,8,*,8,*">
+                            <StackPanel Grid.Column="0" Spacing="4">
+                                <TextBlock Text="UNDERLYING $" Classes="Label"/>
+                                <TextBox x:Name="UnderlyingPriceInput" PlaceholderText="opt"
+                                         FontSize="12" Padding="10,7"/>
+                            </StackPanel>
+                            <StackPanel Grid.Column="2" Spacing="4">
+                                <TextBlock Text="IV RANK" Classes="Label"/>
+                                <TextBox x:Name="IvRankInput" PlaceholderText="0–100"
+                                         FontSize="12" Padding="10,7"/>
+                            </StackPanel>
+                            <StackPanel Grid.Column="4" Spacing="4">
+                                <TextBlock Text="IV AT ENTRY" Classes="Label"/>
+                                <TextBox x:Name="IvInput" PlaceholderText="opt"
+                                         FontSize="12" Padding="10,7"/>
+                            </StackPanel>
+                            <StackPanel Grid.Column="6" Spacing="4">
+                                <TextBlock Text="VIX" Classes="Label"/>
+                                <TextBox x:Name="VixInput" PlaceholderText="opt"
+                                         FontSize="12" Padding="10,7"/>
+                            </StackPanel>
+                        </Grid>
+                    </StackPanel>
+                </Border>
+
+                <!-- Tags -->
+                <Border Classes="Section">
+                    <StackPanel Spacing="10">
+                        <TextBlock Text="TAGS (OPTIONAL)" Classes="Label"/>
+                        <Grid ColumnDefinitions="*,8,*">
+                            <StackPanel Grid.Column="0" Spacing="4">
+                                <TextBlock Text="SETUP TAGS (comma-separated)" Classes="Label"/>
+                                <TextBox x:Name="SetupTagsInput" PlaceholderText="breakout, mean_reversion"
+                                         FontSize="12" Padding="10,7"/>
+                            </StackPanel>
+                            <StackPanel Grid.Column="2" Spacing="4">
+                                <TextBlock Text="THEME TAGS (comma-separated)" Classes="Label"/>
+                                <TextBox x:Name="ThemeTagsInput" PlaceholderText="ai_capex, rates"
+                                         FontSize="12" Padding="10,7"/>
+                            </StackPanel>
+                        </Grid>
+                    </StackPanel>
+                </Border>
+
+                <!-- Error -->
+                <TextBlock x:Name="ErrorMsg" Text="" Foreground="#BF1B1B"
+                           FontSize="12" TextWrapping="Wrap" IsVisible="False"/>
+
+            </StackPanel>
+        </ScrollViewer>
+
+        <Rectangle Grid.Row="2" Fill="#141820"/>
+
+        <!-- Action bar -->
+        <Grid Grid.Row="3" ColumnDefinitions="*,Auto,12,Auto" Margin="24,0">
+            <StackPanel Grid.Column="0" VerticalAlignment="Center">
+                <TextBlock x:Name="ValidationHint" Text="Fill in required fields to log the trade."
+                           FontSize="11" Foreground="#2A3040"/>
+            </StackPanel>
+            <Button Grid.Column="1"
+                    Content="CANCEL"
+                    Background="#111620" Foreground="#4A5568"
+                    FontSize="11" FontWeight="Bold"
+                    Width="90" Height="34" CornerRadius="3"
+                    Cursor="Hand"
+                    Click="OnCancel"/>
+            <Button Grid.Column="3"
+                    x:Name="LogBtn"
+                    Content="LOG TRADE  ↵"
+                    Background="#038C4C" Foreground="#EBFFFF"
+                    FontSize="12" FontWeight="Bold"
+                    Width="130" Height="34" CornerRadius="3"
+                    Cursor="Hand"
+                    Click="OnLogTrade"/>
+        </Grid>
+    </Grid>
+</Window>

@@ -14,34 +14,49 @@
         <!-- ── Nav sidebar button ── -->
         <Style Selector="Button.NavItem">
             <Setter Property="Background" Value="Transparent"/>
-            <Setter Property="Foreground" Value="#EBFFFF"/>
+            <Setter Property="Foreground" Value="#8090A8"/>
             <Setter Property="HorizontalContentAlignment" Value="Left"/>
             <Setter Property="VerticalContentAlignment" Value="Center"/>
-            <Setter Property="Padding" Value="22,11"/>
+            <Setter Property="Padding" Value="19,11"/>
             <Setter Property="HorizontalAlignment" Value="Stretch"/>
             <Setter Property="BorderThickness" Value="0"/>
             <Setter Property="FontSize" Value="13"/>
             <Setter Property="Cursor" Value="Hand"/>
             <Setter Property="Template">
                 <ControlTemplate>
-                    <Border Background="{TemplateBinding Background}"
-                            Padding="{TemplateBinding Padding}">
-                        <ContentPresenter Content="{TemplateBinding Content}"
-                                          HorizontalAlignment="{TemplateBinding HorizontalContentAlignment}"
-                                          VerticalAlignment="{TemplateBinding VerticalContentAlignment}"
-                                          TextElement.Foreground="{TemplateBinding Foreground}"
-                                          TextElement.FontSize="{TemplateBinding FontSize}"/>
-                    </Border>
+                    <Grid ColumnDefinitions="3,*">
+                        <Rectangle x:Name="ActiveBar" Grid.Column="0" Fill="Transparent"/>
+                        <Border Grid.Column="1"
+                                Background="{TemplateBinding Background}"
+                                Padding="{TemplateBinding Padding}">
+                            <ContentPresenter Content="{TemplateBinding Content}"
+                                              HorizontalAlignment="{TemplateBinding HorizontalContentAlignment}"
+                                              VerticalAlignment="{TemplateBinding VerticalContentAlignment}"
+                                              TextElement.Foreground="{TemplateBinding Foreground}"
+                                              TextElement.FontSize="{TemplateBinding FontSize}"/>
+                        </Border>
+                    </Grid>
                 </ControlTemplate>
             </Setter>
         </Style>
         <Style Selector="Button.NavItem:pointerover">
-            <Setter Property="Background" Value="#161920"/>
+            <Setter Property="Background" Value="#111520"/>
             <Setter Property="Foreground" Value="#C8CDD8"/>
         </Style>
         <Style Selector="Button.NavItem:pressed">
-            <Setter Property="Background" Value="#111419"/>
-            <Setter Property="Foreground" Value="#FFFFFF"/>
+            <Setter Property="Background" Value="#0D1018"/>
+            <Setter Property="Foreground" Value="#EBFFFF"/>
+        </Style>
+        <!-- Active: green left bar + bright text -->
+        <Style Selector="Button.NavItem.Active">
+            <Setter Property="Background" Value="#0A1A10"/>
+            <Setter Property="Foreground" Value="#EBFFFF"/>
+        </Style>
+        <Style Selector="Button.NavItem.Active /template/ Rectangle#ActiveBar">
+            <Setter Property="Fill" Value="#038C4C"/>
+        </Style>
+        <Style Selector="Button.NavItem.Active:pointerover">
+            <Setter Property="Background" Value="#0C1F14"/>
         </Style>
 
         <!-- ── Primary (green CTA) button ── -->
@@ -238,29 +253,36 @@
                         <TextBlock x:Name="SidebarAccountName"
                                    Text=""
                                    FontSize="11"
-                                   Foreground="#EBFFFF"/>
+                                   Foreground="#6070A0"/>
                     </StackPanel>
 
                     <Rectangle Grid.Row="1" Fill="#191D26"/>
 
                     <!-- Nav items -->
-                    <StackPanel Grid.Row="2" Margin="0,10,0,0">
+                    <StackPanel Grid.Row="2" Margin="0,6,0,0">
+                        <Button x:Name="NavHome"
+                                Classes="NavItem"
+                                Content="Home"
+                                Click="OnNavHome"/>
+                        <Rectangle Height="1" Fill="#191D26" Margin="0,6,0,6"/>
                         <TextBlock Text="MODULES"
                                    FontSize="8" FontWeight="Bold"
-                                   Foreground="#EBFFFF"
-                                   Margin="22,8,0,4"/>
-                        <Button Classes="NavItem" Content="Trade Journal"/>
-                        <Button Classes="NavItem" Content="Research"/>
-                        <Button Classes="NavItem" Content="Edge Discovery"/>
-                        <Button Classes="NavItem" Content="Screener"/>
-                        <Button Classes="NavItem" Content="Income / Sweep"/>
+                                   Foreground="#2A3040"
+                                   LetterSpacing="1"
+                                   Margin="22,4,0,4"/>
+                        <Button x:Name="NavJournal"   Classes="NavItem" Content="Trade Journal" Click="OnNavJournal"/>
+                        <Button x:Name="NavResearch"  Classes="NavItem" Content="Research"       Click="OnNavResearch"/>
+                        <Button x:Name="NavEdge"      Classes="NavItem" Content="Edge Discovery" Click="OnNavEdge"/>
+                        <Button x:Name="NavQuant"     Classes="NavItem" Content="Quant Analysis" Click="OnNavQuant"/>
+                        <Button x:Name="NavScreener"  Classes="NavItem" Content="Screener"       Click="OnNavScreener"/>
+                        <Button x:Name="NavIncome"    Classes="NavItem" Content="Income / Sweep" Click="OnNavIncome"/>
                     </StackPanel>
 
                     <Rectangle Grid.Row="3" Fill="#191D26"/>
 
                     <!-- Footer: settings + status -->
                     <StackPanel Grid.Row="4" Margin="0,4,0,0">
-                        <Button Classes="NavItem" Content="Settings"/>
+                        <Button x:Name="NavSettings" Classes="NavItem" Content="Settings"/>
                         <StackPanel Orientation="Horizontal"
                                     Margin="22,6,22,16" Spacing="6">
                             <Ellipse Width="5" Height="5" Fill="#FF9500"
@@ -274,21 +296,21 @@
                 </Grid>
             </Border>
 
-            <!-- ── Main content area (placeholder) ── -->
-            <Grid Grid.Column="1">
+            <!-- ── Main content area ── -->
+            <ContentControl x:Name="MainContent" Grid.Column="1" Background="#0A0A0A">
                 <StackPanel VerticalAlignment="Center"
                             HorizontalAlignment="Center"
                             Spacing="10">
                     <TextBlock Text="Select a module"
                                FontSize="22" FontWeight="Bold"
-                               Foreground="#EBFFFF"
+                               Foreground="#1C2028"
                                HorizontalAlignment="Center"/>
                     <TextBlock Text="Choose a section from the sidebar to get started."
                                FontSize="12"
-                               Foreground="#EBFFFF"
+                               Foreground="#1C2028"
                                HorizontalAlignment="Center"/>
                 </StackPanel>
-            </Grid>
+            </ContentControl>
         </Grid>
 
     </Grid>

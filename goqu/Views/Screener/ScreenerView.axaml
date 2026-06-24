@@ -1,0 +1,1088 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:local="clr-namespace:goqu.Views.Screener"
+             x:Class="goqu.Views.Screener.ScreenerView"
+             Background="#0A0A0A">
+
+    <UserControl.Styles>
+
+        <!-- ── FilterChip: toggleable exchange/index tag button ── -->
+        <Style Selector="Button.FilterChip">
+            <Setter Property="Background" Value="#0D1020"/>
+            <Setter Property="Foreground" Value="#4A5568"/>
+            <Setter Property="FontSize" Value="10"/>
+            <Setter Property="Padding" Value="7,3"/>
+            <Setter Property="BorderBrush" Value="#1A2030"/>
+            <Setter Property="BorderThickness" Value="1"/>
+            <Setter Property="CornerRadius" Value="3"/>
+            <Setter Property="Cursor" Value="Hand"/>
+            <Setter Property="Template">
+                <ControlTemplate>
+                    <Border Background="{TemplateBinding Background}"
+                            CornerRadius="{TemplateBinding CornerRadius}"
+                            BorderBrush="{TemplateBinding BorderBrush}"
+                            BorderThickness="{TemplateBinding BorderThickness}"
+                            Padding="{TemplateBinding Padding}">
+                        <ContentPresenter Content="{TemplateBinding Content}"
+                                          TextElement.Foreground="{TemplateBinding Foreground}"
+                                          TextElement.FontSize="{TemplateBinding FontSize}"
+                                          HorizontalAlignment="Center"
+                                          VerticalAlignment="Center"/>
+                    </Border>
+                </ControlTemplate>
+            </Setter>
+        </Style>
+        <Style Selector="Button.FilterChip:pointerover">
+            <Setter Property="Background" Value="#0F1428"/>
+            <Setter Property="Foreground" Value="#8090A8"/>
+        </Style>
+        <Style Selector="Button.FilterChip.Active">
+            <Setter Property="Background" Value="#1A1000"/>
+            <Setter Property="Foreground" Value="#FF9500"/>
+            <Setter Property="BorderBrush" Value="#FF9500"/>
+        </Style>
+
+        <!-- ── SectionHeader: collapsible filter section ── -->
+        <Style Selector="Button.SectionHeader">
+            <Setter Property="Background" Value="Transparent"/>
+            <Setter Property="Foreground" Value="#FF9500"/>
+            <Setter Property="HorizontalAlignment" Value="Stretch"/>
+            <Setter Property="HorizontalContentAlignment" Value="Stretch"/>
+            <Setter Property="Padding" Value="16,10"/>
+            <Setter Property="BorderThickness" Value="0"/>
+            <Setter Property="Cursor" Value="Hand"/>
+            <Setter Property="Template">
+                <ControlTemplate>
+                    <Border Background="{TemplateBinding Background}"
+                            Padding="{TemplateBinding Padding}"
+                            BorderBrush="#0F1420"
+                            BorderThickness="0,0,0,1">
+                        <ContentPresenter Content="{TemplateBinding Content}"
+                                          HorizontalAlignment="Stretch"
+                                          VerticalAlignment="Center"/>
+                    </Border>
+                </ControlTemplate>
+            </Setter>
+        </Style>
+        <Style Selector="Button.SectionHeader:pointerover">
+            <Setter Property="Background" Value="#0B0D18"/>
+        </Style>
+
+        <!-- ── SmallBtn: small utility button ── -->
+        <Style Selector="Button.SmallBtn">
+            <Setter Property="Background" Value="Transparent"/>
+            <Setter Property="Foreground" Value="#2A3A50"/>
+            <Setter Property="FontSize" Value="9"/>
+            <Setter Property="FontWeight" Value="Bold"/>
+            <Setter Property="Padding" Value="7,3"/>
+            <Setter Property="BorderBrush" Value="#1A2030"/>
+            <Setter Property="BorderThickness" Value="1"/>
+            <Setter Property="CornerRadius" Value="3"/>
+            <Setter Property="Cursor" Value="Hand"/>
+            <Setter Property="Template">
+                <ControlTemplate>
+                    <Border Background="{TemplateBinding Background}"
+                            CornerRadius="{TemplateBinding CornerRadius}"
+                            BorderBrush="{TemplateBinding BorderBrush}"
+                            BorderThickness="{TemplateBinding BorderThickness}"
+                            Padding="{TemplateBinding Padding}">
+                        <ContentPresenter Content="{TemplateBinding Content}"
+                                          TextElement.Foreground="{TemplateBinding Foreground}"
+                                          TextElement.FontSize="{TemplateBinding FontSize}"
+                                          HorizontalAlignment="Center"
+                                          VerticalAlignment="Center"/>
+                    </Border>
+                </ControlTemplate>
+            </Setter>
+        </Style>
+        <Style Selector="Button.SmallBtn:pointerover">
+            <Setter Property="Foreground" Value="#FF9500"/>
+            <Setter Property="BorderBrush" Value="#FF9500"/>
+        </Style>
+
+        <!-- ── RunBtn: orange run screen button ── -->
+        <Style Selector="Button.RunBtn">
+            <Setter Property="Background" Value="#FF9500"/>
+            <Setter Property="Foreground" Value="#000000"/>
+            <Setter Property="FontWeight" Value="Bold"/>
+            <Setter Property="FontSize" Value="11"/>
+            <Setter Property="Padding" Value="18,0"/>
+            <Setter Property="Height" Value="32"/>
+            <Setter Property="CornerRadius" Value="4"/>
+            <Setter Property="Cursor" Value="Hand"/>
+            <Setter Property="Template">
+                <ControlTemplate>
+                    <Border Background="{TemplateBinding Background}"
+                            CornerRadius="{TemplateBinding CornerRadius}"
+                            Padding="{TemplateBinding Padding}">
+                        <ContentPresenter Content="{TemplateBinding Content}"
+                                          TextElement.Foreground="{TemplateBinding Foreground}"
+                                          TextElement.FontWeight="{TemplateBinding FontWeight}"
+                                          TextElement.FontSize="{TemplateBinding FontSize}"
+                                          HorizontalAlignment="Center"
+                                          VerticalAlignment="Center"/>
+                    </Border>
+                </ControlTemplate>
+            </Setter>
+        </Style>
+        <Style Selector="Button.RunBtn:pointerover">
+            <Setter Property="Background" Value="#FFB030"/>
+        </Style>
+        <Style Selector="Button.RunBtn:pressed">
+            <Setter Property="Background" Value="#E08000"/>
+        </Style>
+
+        <!-- ── ColHeader: sortable column header button ── -->
+        <Style Selector="Button.ColHeader">
+            <Setter Property="Background" Value="Transparent"/>
+            <Setter Property="Foreground" Value="#1E2830"/>
+            <Setter Property="FontSize" Value="8"/>
+            <Setter Property="FontWeight" Value="Bold"/>
+            <Setter Property="Padding" Value="0"/>
+            <Setter Property="BorderThickness" Value="0"/>
+            <Setter Property="Cursor" Value="Hand"/>
+            <Setter Property="Template">
+                <ControlTemplate>
+                    <ContentPresenter Content="{TemplateBinding Content}"
+                                      TextElement.Foreground="{TemplateBinding Foreground}"
+                                      TextElement.FontSize="{TemplateBinding FontSize}"
+                                      TextElement.FontWeight="{TemplateBinding FontWeight}"
+                                      HorizontalAlignment="Left"
+                                      VerticalAlignment="Center"/>
+                </ControlTemplate>
+            </Setter>
+        </Style>
+        <Style Selector="Button.ColHeader:pointerover">
+            <Setter Property="Foreground" Value="#FF9500"/>
+        </Style>
+        <Style Selector="Button.ColHeader.SortAsc">
+            <Setter Property="Foreground" Value="#FF9500"/>
+        </Style>
+        <Style Selector="Button.ColHeader.SortDesc">
+            <Setter Property="Foreground" Value="#FF9500"/>
+        </Style>
+
+    </UserControl.Styles>
+
+    <Grid ColumnDefinitions="280,1,*">
+
+        <!-- ════════════════════════════════════════════════════════════
+             LEFT — Filter Panel
+             ════════════════════════════════════════════════════════════ -->
+        <Border Grid.Column="0" Background="#090B12">
+            <Grid RowDefinitions="Auto,1,*">
+
+                <!-- Filter panel header -->
+                <Grid Grid.Row="0" Margin="16,12,12,12" ColumnDefinitions="*,Auto">
+                    <StackPanel Grid.Column="0" Spacing="1">
+                        <TextBlock Text="FILTERS"
+                                   FontSize="9" FontWeight="Bold"
+                                   Foreground="#FF9500" LetterSpacing="1"/>
+                        <TextBlock x:Name="ActiveFilterCount"
+                                   Text="no filters active"
+                                   FontSize="10" Foreground="#1C2030"/>
+                    </StackPanel>
+                    <Button Grid.Column="1" Classes="SmallBtn"
+                            Content="CLEAR ALL"
+                            VerticalAlignment="Center"
+                            Click="OnClearAll"/>
+                </Grid>
+
+                <Rectangle Grid.Row="1" Fill="#141820"/>
+
+                <!-- Scrollable filter sections -->
+                <ScrollViewer Grid.Row="2" HorizontalScrollBarVisibility="Disabled">
+                    <StackPanel>
+
+                        <!-- ▼ UNIVERSE ─────────────────────────────────── -->
+                        <Button Classes="SectionHeader" Click="OnToggleUniverse">
+                            <Grid ColumnDefinitions="Auto,*,Auto">
+                                <TextBlock Grid.Column="0" x:Name="UniverseChevron"
+                                           Text="▼" FontSize="8" Foreground="#FF9500"
+                                           VerticalAlignment="Center" Margin="0,0,7,0"/>
+                                <TextBlock Grid.Column="1" Text="UNIVERSE"
+                                           FontSize="9" FontWeight="Bold" Foreground="#FF9500"
+                                           LetterSpacing="1" VerticalAlignment="Center"/>
+                            </Grid>
+                        </Button>
+
+                        <StackPanel x:Name="UniverseContent" Margin="16,10,16,14" Spacing="10">
+
+                            <!-- Exchange -->
+                            <StackPanel Spacing="5">
+                                <TextBlock Text="EXCHANGE" FontSize="8" FontWeight="Bold" Foreground="#2A3040"/>
+                                <StackPanel Orientation="Horizontal" Spacing="4">
+                                    <Button Classes="FilterChip" Content="NYSE"   Click="OnChipToggle"/>
+                                    <Button Classes="FilterChip Active" Content="NASDAQ" Click="OnChipToggle"/>
+                                    <Button Classes="FilterChip Active" Content="NYSE"   Click="OnChipToggle"/>
+                                    <Button Classes="FilterChip" Content="AMEX"   Click="OnChipToggle"/>
+                                    <Button Classes="FilterChip" Content="OTC"    Click="OnChipToggle"/>
+                                </StackPanel>
+                            </StackPanel>
+
+                            <!-- Index Membership -->
+                            <StackPanel Spacing="5">
+                                <TextBlock Text="INDEX MEMBERSHIP" FontSize="8" FontWeight="Bold" Foreground="#2A3040"/>
+                                <WrapPanel Orientation="Horizontal">
+                                    <Button Classes="FilterChip" Content="S&amp;P 500"    Click="OnChipToggle" Margin="0,0,4,4"/>
+                                    <Button Classes="FilterChip" Content="S&amp;P 400"    Click="OnChipToggle" Margin="0,0,4,4"/>
+                                    <Button Classes="FilterChip" Content="Russell 2000"   Click="OnChipToggle" Margin="0,0,4,4"/>
+                                    <Button Classes="FilterChip" Content="NASDAQ 100"     Click="OnChipToggle" Margin="0,0,4,4"/>
+                                    <Button Classes="FilterChip" Content="DJIA"           Click="OnChipToggle" Margin="0,0,4,4"/>
+                                    <Button Classes="FilterChip" Content="Russell 1000"   Click="OnChipToggle" Margin="0,0,4,4"/>
+                                </WrapPanel>
+                            </StackPanel>
+
+                            <!-- Sector -->
+                            <StackPanel Spacing="5">
+                                <TextBlock Text="SECTOR" FontSize="8" FontWeight="Bold" Foreground="#2A3040"/>
+                                <ComboBox x:Name="SectorFilter" SelectedIndex="0"
+                                          FontSize="11" Height="26" HorizontalAlignment="Stretch">
+                                    <ComboBoxItem Content="All Sectors"/>
+                                    <ComboBoxItem Content="Technology"/>
+                                    <ComboBoxItem Content="Healthcare"/>
+                                    <ComboBoxItem Content="Financials"/>
+                                    <ComboBoxItem Content="Consumer Discretionary"/>
+                                    <ComboBoxItem Content="Consumer Staples"/>
+                                    <ComboBoxItem Content="Energy"/>
+                                    <ComboBoxItem Content="Industrials"/>
+                                    <ComboBoxItem Content="Materials"/>
+                                    <ComboBoxItem Content="Communication Services"/>
+                                    <ComboBoxItem Content="Real Estate"/>
+                                    <ComboBoxItem Content="Utilities"/>
+                                </ComboBox>
+                            </StackPanel>
+
+                            <!-- Market Cap -->
+                            <StackPanel Spacing="5">
+                                <TextBlock Text="MARKET CAP ($M)" FontSize="8" FontWeight="Bold" Foreground="#2A3040"/>
+                                <Grid ColumnDefinitions="*,10,*">
+                                    <TextBox Grid.Column="0" x:Name="MktCapMin"
+                                             PlaceholderText="Min" FontSize="11" Height="26" Padding="6,4"
+                                             TextChanged="OnRangeChanged"/>
+                                    <TextBlock Grid.Column="1" Text="—" VerticalAlignment="Center"
+                                               HorizontalAlignment="Center" Foreground="#2A3040" FontSize="11"/>
+                                    <TextBox Grid.Column="2" x:Name="MktCapMax"
+                                             PlaceholderText="Max" FontSize="11" Height="26" Padding="6,4"
+                                             TextChanged="OnRangeChanged"/>
+                                </Grid>
+                                <StackPanel Orientation="Horizontal" Spacing="4">
+                                    <Button Classes="FilterChip" Content="Micro &lt;300M"  Click="OnMktCapPreset" Tag="0,300"/>
+                                    <Button Classes="FilterChip" Content="Small &lt;2B"    Click="OnMktCapPreset" Tag="300,2000"/>
+                                    <Button Classes="FilterChip" Content="Mid &lt;10B"     Click="OnMktCapPreset" Tag="2000,10000"/>
+                                </StackPanel>
+                                <StackPanel Orientation="Horizontal" Spacing="4">
+                                    <Button Classes="FilterChip" Content="Large &lt;200B"  Click="OnMktCapPreset" Tag="10000,200000"/>
+                                    <Button Classes="FilterChip" Content="Mega &gt;200B"   Click="OnMktCapPreset" Tag="200000,"/>
+                                </StackPanel>
+                            </StackPanel>
+
+                        </StackPanel>
+
+                        <!-- ▼ FUNDAMENTALS ──────────────────────────────── -->
+                        <Button Classes="SectionHeader" Click="OnToggleFundamentals">
+                            <Grid ColumnDefinitions="Auto,*,Auto">
+                                <TextBlock Grid.Column="0" x:Name="FundChevron"
+                                           Text="▼" FontSize="8" Foreground="#FF9500"
+                                           VerticalAlignment="Center" Margin="0,0,7,0"/>
+                                <TextBlock Grid.Column="1" Text="FUNDAMENTALS"
+                                           FontSize="9" FontWeight="Bold" Foreground="#FF9500"
+                                           LetterSpacing="1" VerticalAlignment="Center"/>
+                                <Border Grid.Column="2" x:Name="FundBadge" Background="#1A1000"
+                                        CornerRadius="10" Padding="6,1" IsVisible="False">
+                                    <TextBlock x:Name="FundCount" Text="0"
+                                               FontSize="9" Foreground="#FF9500"/>
+                                </Border>
+                            </Grid>
+                        </Button>
+
+                        <StackPanel x:Name="FundamentalsContent" Margin="16,10,16,14" Spacing="10">
+
+                            <!-- Sub: Valuation -->
+                            <TextBlock Text="VALUATION" FontSize="7" FontWeight="Bold"
+                                       Foreground="#1C2030" LetterSpacing="1" Margin="0,4,0,0"/>
+
+                            <StackPanel Spacing="3">
+                                <TextBlock Text="P/E RATIO" FontSize="8" FontWeight="Bold" Foreground="#2A3040"/>
+                                <Grid ColumnDefinitions="*,10,*">
+                                    <TextBox Grid.Column="0" x:Name="PEMin" PlaceholderText="Min" FontSize="11" Height="26" Padding="6,4" TextChanged="OnRangeChanged"/>
+                                    <TextBlock Grid.Column="1" Text="—" VerticalAlignment="Center" HorizontalAlignment="Center" Foreground="#2A3040" FontSize="11"/>
+                                    <TextBox Grid.Column="2" x:Name="PEMax" PlaceholderText="Max" FontSize="11" Height="26" Padding="6,4" TextChanged="OnRangeChanged"/>
+                                </Grid>
+                            </StackPanel>
+
+                            <StackPanel Spacing="3">
+                                <TextBlock Text="FORWARD P/E" FontSize="8" FontWeight="Bold" Foreground="#2A3040"/>
+                                <Grid ColumnDefinitions="*,10,*">
+                                    <TextBox Grid.Column="0" x:Name="FwdPEMin" PlaceholderText="Min" FontSize="11" Height="26" Padding="6,4" TextChanged="OnRangeChanged"/>
+                                    <TextBlock Grid.Column="1" Text="—" VerticalAlignment="Center" HorizontalAlignment="Center" Foreground="#2A3040" FontSize="11"/>
+                                    <TextBox Grid.Column="2" x:Name="FwdPEMax" PlaceholderText="Max" FontSize="11" Height="26" Padding="6,4" TextChanged="OnRangeChanged"/>
+                                </Grid>
+                            </StackPanel>
+
+                            <StackPanel Spacing="3">
+                                <TextBlock Text="PEG RATIO" FontSize="8" FontWeight="Bold" Foreground="#2A3040"/>
+                                <Grid ColumnDefinitions="*,10,*">
+                                    <TextBox Grid.Column="0" x:Name="PEGMin" PlaceholderText="Min" FontSize="11" Height="26" Padding="6,4" TextChanged="OnRangeChanged"/>
+                                    <TextBlock Grid.Column="1" Text="—" VerticalAlignment="Center" HorizontalAlignment="Center" Foreground="#2A3040" FontSize="11"/>
+                                    <TextBox Grid.Column="2" x:Name="PEGMax" PlaceholderText="Max" FontSize="11" Height="26" Padding="6,4" TextChanged="OnRangeChanged"/>
+                                </Grid>
+                            </StackPanel>
+
+                            <StackPanel Spacing="3">
+                                <TextBlock Text="PRICE / BOOK" FontSize="8" FontWeight="Bold" Foreground="#2A3040"/>
+                                <Grid ColumnDefinitions="*,10,*">
+                                    <TextBox Grid.Column="0" x:Name="PBMin" PlaceholderText="Min" FontSize="11" Height="26" Padding="6,4" TextChanged="OnRangeChanged"/>
+                                    <TextBlock Grid.Column="1" Text="—" VerticalAlignment="Center" HorizontalAlignment="Center" Foreground="#2A3040" FontSize="11"/>
+                                    <TextBox Grid.Column="2" x:Name="PBMax" PlaceholderText="Max" FontSize="11" Height="26" Padding="6,4" TextChanged="OnRangeChanged"/>
+                                </Grid>
+                            </StackPanel>
+
+                            <StackPanel Spacing="3">
+                                <TextBlock Text="PRICE / SALES" FontSize="8" FontWeight="Bold" Foreground="#2A3040"/>
+                                <Grid ColumnDefinitions="*,10,*">
+                                    <TextBox Grid.Column="0" x:Name="PSMin" PlaceholderText="Min" FontSize="11" Height="26" Padding="6,4" TextChanged="OnRangeChanged"/>
+                                    <TextBlock Grid.Column="1" Text="—" VerticalAlignment="Center" HorizontalAlignment="Center" Foreground="#2A3040" FontSize="11"/>
+                                    <TextBox Grid.Column="2" x:Name="PSMax" PlaceholderText="Max" FontSize="11" Height="26" Padding="6,4" TextChanged="OnRangeChanged"/>
+                                </Grid>
+                            </StackPanel>
+
+                            <StackPanel Spacing="3">
+                                <TextBlock Text="EV / EBITDA" FontSize="8" FontWeight="Bold" Foreground="#2A3040"/>
+                                <Grid ColumnDefinitions="*,10,*">
+                                    <TextBox Grid.Column="0" x:Name="EVEBITDAMin" PlaceholderText="Min" FontSize="11" Height="26" Padding="6,4" TextChanged="OnRangeChanged"/>
+                                    <TextBlock Grid.Column="1" Text="—" VerticalAlignment="Center" HorizontalAlignment="Center" Foreground="#2A3040" FontSize="11"/>
+                                    <TextBox Grid.Column="2" x:Name="EVEBITDAMax" PlaceholderText="Max" FontSize="11" Height="26" Padding="6,4" TextChanged="OnRangeChanged"/>
+                                </Grid>
+                            </StackPanel>
+
+                            <!-- Sub: Profitability -->
+                            <TextBlock Text="PROFITABILITY" FontSize="7" FontWeight="Bold"
+                                       Foreground="#1C2030" LetterSpacing="1" Margin="0,6,0,0"/>
+
+                            <StackPanel Spacing="3">
+                                <TextBlock Text="GROSS MARGIN %" FontSize="8" FontWeight="Bold" Foreground="#2A3040"/>
+                                <Grid ColumnDefinitions="*,10,*">
+                                    <TextBox Grid.Column="0" x:Name="GrossMarginMin" PlaceholderText="Min" FontSize="11" Height="26" Padding="6,4" TextChanged="OnRangeChanged"/>
+                                    <TextBlock Grid.Column="1" Text="—" VerticalAlignment="Center" HorizontalAlignment="Center" Foreground="#2A3040" FontSize="11"/>
+                                    <TextBox Grid.Column="2" x:Name="GrossMarginMax" PlaceholderText="Max" FontSize="11" Height="26" Padding="6,4" TextChanged="OnRangeChanged"/>
+                                </Grid>
+                            </StackPanel>
+
+                            <StackPanel Spacing="3">
+                                <TextBlock Text="OPERATING MARGIN %" FontSize="8" FontWeight="Bold" Foreground="#2A3040"/>
+                                <Grid ColumnDefinitions="*,10,*">
+                                    <TextBox Grid.Column="0" x:Name="OpMarginMin" PlaceholderText="Min" FontSize="11" Height="26" Padding="6,4" TextChanged="OnRangeChanged"/>
+                                    <TextBlock Grid.Column="1" Text="—" VerticalAlignment="Center" HorizontalAlignment="Center" Foreground="#2A3040" FontSize="11"/>
+                                    <TextBox Grid.Column="2" x:Name="OpMarginMax" PlaceholderText="Max" FontSize="11" Height="26" Padding="6,4" TextChanged="OnRangeChanged"/>
+                                </Grid>
+                            </StackPanel>
+
+                            <StackPanel Spacing="3">
+                                <TextBlock Text="NET MARGIN %" FontSize="8" FontWeight="Bold" Foreground="#2A3040"/>
+                                <Grid ColumnDefinitions="*,10,*">
+                                    <TextBox Grid.Column="0" x:Name="NetMarginMin" PlaceholderText="Min" FontSize="11" Height="26" Padding="6,4" TextChanged="OnRangeChanged"/>
+                                    <TextBlock Grid.Column="1" Text="—" VerticalAlignment="Center" HorizontalAlignment="Center" Foreground="#2A3040" FontSize="11"/>
+                                    <TextBox Grid.Column="2" x:Name="NetMarginMax" PlaceholderText="Max" FontSize="11" Height="26" Padding="6,4" TextChanged="OnRangeChanged"/>
+                                </Grid>
+                            </StackPanel>
+
+                            <StackPanel Spacing="3">
+                                <TextBlock Text="RETURN ON EQUITY %" FontSize="8" FontWeight="Bold" Foreground="#2A3040"/>
+                                <Grid ColumnDefinitions="*,10,*">
+                                    <TextBox Grid.Column="0" x:Name="ROEMin" PlaceholderText="Min" FontSize="11" Height="26" Padding="6,4" TextChanged="OnRangeChanged"/>
+                                    <TextBlock Grid.Column="1" Text="—" VerticalAlignment="Center" HorizontalAlignment="Center" Foreground="#2A3040" FontSize="11"/>
+                                    <TextBox Grid.Column="2" x:Name="ROEMax" PlaceholderText="Max" FontSize="11" Height="26" Padding="6,4" TextChanged="OnRangeChanged"/>
+                                </Grid>
+                            </StackPanel>
+
+                            <StackPanel Spacing="3">
+                                <TextBlock Text="RETURN ON ASSETS %" FontSize="8" FontWeight="Bold" Foreground="#2A3040"/>
+                                <Grid ColumnDefinitions="*,10,*">
+                                    <TextBox Grid.Column="0" x:Name="ROAMin" PlaceholderText="Min" FontSize="11" Height="26" Padding="6,4" TextChanged="OnRangeChanged"/>
+                                    <TextBlock Grid.Column="1" Text="—" VerticalAlignment="Center" HorizontalAlignment="Center" Foreground="#2A3040" FontSize="11"/>
+                                    <TextBox Grid.Column="2" x:Name="ROAMax" PlaceholderText="Max" FontSize="11" Height="26" Padding="6,4" TextChanged="OnRangeChanged"/>
+                                </Grid>
+                            </StackPanel>
+
+                            <StackPanel Spacing="3">
+                                <TextBlock Text="FCF YIELD %" FontSize="8" FontWeight="Bold" Foreground="#2A3040"/>
+                                <Grid ColumnDefinitions="*,10,*">
+                                    <TextBox Grid.Column="0" x:Name="FCFYieldMin" PlaceholderText="Min" FontSize="11" Height="26" Padding="6,4" TextChanged="OnRangeChanged"/>
+                                    <TextBlock Grid.Column="1" Text="—" VerticalAlignment="Center" HorizontalAlignment="Center" Foreground="#2A3040" FontSize="11"/>
+                                    <TextBox Grid.Column="2" x:Name="FCFYieldMax" PlaceholderText="Max" FontSize="11" Height="26" Padding="6,4" TextChanged="OnRangeChanged"/>
+                                </Grid>
+                            </StackPanel>
+
+                            <!-- Sub: Growth -->
+                            <TextBlock Text="GROWTH" FontSize="7" FontWeight="Bold"
+                                       Foreground="#1C2030" LetterSpacing="1" Margin="0,6,0,0"/>
+
+                            <StackPanel Spacing="3">
+                                <TextBlock Text="REVENUE GROWTH YoY %" FontSize="8" FontWeight="Bold" Foreground="#2A3040"/>
+                                <Grid ColumnDefinitions="*,10,*">
+                                    <TextBox Grid.Column="0" x:Name="RevGrowthMin" PlaceholderText="Min" FontSize="11" Height="26" Padding="6,4" TextChanged="OnRangeChanged"/>
+                                    <TextBlock Grid.Column="1" Text="—" VerticalAlignment="Center" HorizontalAlignment="Center" Foreground="#2A3040" FontSize="11"/>
+                                    <TextBox Grid.Column="2" x:Name="RevGrowthMax" PlaceholderText="Max" FontSize="11" Height="26" Padding="6,4" TextChanged="OnRangeChanged"/>
+                                </Grid>
+                            </StackPanel>
+
+                            <StackPanel Spacing="3">
+                                <TextBlock Text="EPS GROWTH YoY %" FontSize="8" FontWeight="Bold" Foreground="#2A3040"/>
+                                <Grid ColumnDefinitions="*,10,*">
+                                    <TextBox Grid.Column="0" x:Name="EPSGrowthMin" PlaceholderText="Min" FontSize="11" Height="26" Padding="6,4" TextChanged="OnRangeChanged"/>
+                                    <TextBlock Grid.Column="1" Text="—" VerticalAlignment="Center" HorizontalAlignment="Center" Foreground="#2A3040" FontSize="11"/>
+                                    <TextBox Grid.Column="2" x:Name="EPSGrowthMax" PlaceholderText="Max" FontSize="11" Height="26" Padding="6,4" TextChanged="OnRangeChanged"/>
+                                </Grid>
+                            </StackPanel>
+
+                            <StackPanel Spacing="3">
+                                <TextBlock Text="REVENUE 3Y CAGR %" FontSize="8" FontWeight="Bold" Foreground="#2A3040"/>
+                                <Grid ColumnDefinitions="*,10,*">
+                                    <TextBox Grid.Column="0" x:Name="Rev3YMin" PlaceholderText="Min" FontSize="11" Height="26" Padding="6,4" TextChanged="OnRangeChanged"/>
+                                    <TextBlock Grid.Column="1" Text="—" VerticalAlignment="Center" HorizontalAlignment="Center" Foreground="#2A3040" FontSize="11"/>
+                                    <TextBox Grid.Column="2" x:Name="Rev3YMax" PlaceholderText="Max" FontSize="11" Height="26" Padding="6,4" TextChanged="OnRangeChanged"/>
+                                </Grid>
+                            </StackPanel>
+
+                            <!-- Sub: Financial Health -->
+                            <TextBlock Text="FINANCIAL HEALTH" FontSize="7" FontWeight="Bold"
+                                       Foreground="#1C2030" LetterSpacing="1" Margin="0,6,0,0"/>
+
+                            <StackPanel Spacing="3">
+                                <TextBlock Text="DEBT / EQUITY" FontSize="8" FontWeight="Bold" Foreground="#2A3040"/>
+                                <Grid ColumnDefinitions="*,10,*">
+                                    <TextBox Grid.Column="0" x:Name="DEMin" PlaceholderText="Min" FontSize="11" Height="26" Padding="6,4" TextChanged="OnRangeChanged"/>
+                                    <TextBlock Grid.Column="1" Text="—" VerticalAlignment="Center" HorizontalAlignment="Center" Foreground="#2A3040" FontSize="11"/>
+                                    <TextBox Grid.Column="2" x:Name="DEMax" PlaceholderText="Max" FontSize="11" Height="26" Padding="6,4" TextChanged="OnRangeChanged"/>
+                                </Grid>
+                            </StackPanel>
+
+                            <StackPanel Spacing="3">
+                                <TextBlock Text="CURRENT RATIO" FontSize="8" FontWeight="Bold" Foreground="#2A3040"/>
+                                <Grid ColumnDefinitions="*,10,*">
+                                    <TextBox Grid.Column="0" x:Name="CRMin" PlaceholderText="Min" FontSize="11" Height="26" Padding="6,4" TextChanged="OnRangeChanged"/>
+                                    <TextBlock Grid.Column="1" Text="—" VerticalAlignment="Center" HorizontalAlignment="Center" Foreground="#2A3040" FontSize="11"/>
+                                    <TextBox Grid.Column="2" x:Name="CRMax" PlaceholderText="Max" FontSize="11" Height="26" Padding="6,4" TextChanged="OnRangeChanged"/>
+                                </Grid>
+                            </StackPanel>
+
+                            <StackPanel Spacing="3">
+                                <TextBlock Text="INTEREST COVERAGE" FontSize="8" FontWeight="Bold" Foreground="#2A3040"/>
+                                <Grid ColumnDefinitions="*,10,*">
+                                    <TextBox Grid.Column="0" x:Name="ICMin" PlaceholderText="Min" FontSize="11" Height="26" Padding="6,4" TextChanged="OnRangeChanged"/>
+                                    <TextBlock Grid.Column="1" Text="—" VerticalAlignment="Center" HorizontalAlignment="Center" Foreground="#2A3040" FontSize="11"/>
+                                    <TextBox Grid.Column="2" x:Name="ICMax" PlaceholderText="Max" FontSize="11" Height="26" Padding="6,4" TextChanged="OnRangeChanged"/>
+                                </Grid>
+                            </StackPanel>
+
+                        </StackPanel>
+
+                        <!-- ▶ TECHNICALS ─────────────────────────────────── -->
+                        <Button Classes="SectionHeader" Click="OnToggleTechnicals">
+                            <Grid ColumnDefinitions="Auto,*">
+                                <TextBlock Grid.Column="0" x:Name="TechChevron"
+                                           Text="▶" FontSize="8" Foreground="#FF9500"
+                                           VerticalAlignment="Center" Margin="0,0,7,0"/>
+                                <TextBlock Grid.Column="1" Text="TECHNICALS"
+                                           FontSize="9" FontWeight="Bold" Foreground="#FF9500"
+                                           LetterSpacing="1" VerticalAlignment="Center"/>
+                            </Grid>
+                        </Button>
+
+                        <StackPanel x:Name="TechnicalsContent" IsVisible="False"
+                                    Margin="16,10,16,14" Spacing="10">
+
+                            <!-- Sub: Trend -->
+                            <TextBlock Text="TREND" FontSize="7" FontWeight="Bold"
+                                       Foreground="#1C2030" LetterSpacing="1" Margin="0,4,0,0"/>
+
+                            <StackPanel Spacing="3">
+                                <TextBlock Text="PRICE vs SMA 20" FontSize="8" FontWeight="Bold" Foreground="#2A3040"/>
+                                <ComboBox x:Name="SMA20Filter" SelectedIndex="0" FontSize="11" Height="26" HorizontalAlignment="Stretch">
+                                    <ComboBoxItem Content="Any"/>
+                                    <ComboBoxItem Content="Above SMA 20"/>
+                                    <ComboBoxItem Content="Below SMA 20"/>
+                                    <ComboBoxItem Content="&gt; 5% above"/>
+                                    <ComboBoxItem Content="&gt; 10% above"/>
+                                    <ComboBoxItem Content="&lt; 5% below"/>
+                                    <ComboBoxItem Content="&lt; 10% below"/>
+                                </ComboBox>
+                            </StackPanel>
+
+                            <StackPanel Spacing="3">
+                                <TextBlock Text="PRICE vs SMA 50" FontSize="8" FontWeight="Bold" Foreground="#2A3040"/>
+                                <ComboBox x:Name="SMA50Filter" SelectedIndex="0" FontSize="11" Height="26" HorizontalAlignment="Stretch">
+                                    <ComboBoxItem Content="Any"/>
+                                    <ComboBoxItem Content="Above SMA 50"/>
+                                    <ComboBoxItem Content="Below SMA 50"/>
+                                    <ComboBoxItem Content="&gt; 5% above"/>
+                                    <ComboBoxItem Content="&gt; 10% above"/>
+                                    <ComboBoxItem Content="&lt; 5% below"/>
+                                    <ComboBoxItem Content="&lt; 10% below"/>
+                                </ComboBox>
+                            </StackPanel>
+
+                            <StackPanel Spacing="3">
+                                <TextBlock Text="PRICE vs SMA 200" FontSize="8" FontWeight="Bold" Foreground="#2A3040"/>
+                                <ComboBox x:Name="SMA200Filter" SelectedIndex="0" FontSize="11" Height="26" HorizontalAlignment="Stretch">
+                                    <ComboBoxItem Content="Any"/>
+                                    <ComboBoxItem Content="Above SMA 200"/>
+                                    <ComboBoxItem Content="Below SMA 200"/>
+                                    <ComboBoxItem Content="&gt; 10% above"/>
+                                    <ComboBoxItem Content="&gt; 20% above"/>
+                                    <ComboBoxItem Content="&lt; 10% below"/>
+                                    <ComboBoxItem Content="&lt; 20% below"/>
+                                </ComboBox>
+                            </StackPanel>
+
+                            <StackPanel Spacing="3">
+                                <TextBlock Text="% FROM 52W HIGH" FontSize="8" FontWeight="Bold" Foreground="#2A3040"/>
+                                <Grid ColumnDefinitions="*,10,*">
+                                    <TextBox Grid.Column="0" x:Name="HighPctMin" PlaceholderText="Min %" FontSize="11" Height="26" Padding="6,4" TextChanged="OnRangeChanged"/>
+                                    <TextBlock Grid.Column="1" Text="—" VerticalAlignment="Center" HorizontalAlignment="Center" Foreground="#2A3040" FontSize="11"/>
+                                    <TextBox Grid.Column="2" x:Name="HighPctMax" PlaceholderText="Max %" FontSize="11" Height="26" Padding="6,4" TextChanged="OnRangeChanged"/>
+                                </Grid>
+                            </StackPanel>
+
+                            <StackPanel Spacing="3">
+                                <TextBlock Text="% FROM 52W LOW" FontSize="8" FontWeight="Bold" Foreground="#2A3040"/>
+                                <Grid ColumnDefinitions="*,10,*">
+                                    <TextBox Grid.Column="0" x:Name="LowPctMin" PlaceholderText="Min %" FontSize="11" Height="26" Padding="6,4" TextChanged="OnRangeChanged"/>
+                                    <TextBlock Grid.Column="1" Text="—" VerticalAlignment="Center" HorizontalAlignment="Center" Foreground="#2A3040" FontSize="11"/>
+                                    <TextBox Grid.Column="2" x:Name="LowPctMax" PlaceholderText="Max %" FontSize="11" Height="26" Padding="6,4" TextChanged="OnRangeChanged"/>
+                                </Grid>
+                            </StackPanel>
+
+                            <!-- Sub: Momentum -->
+                            <TextBlock Text="MOMENTUM" FontSize="7" FontWeight="Bold"
+                                       Foreground="#1C2030" LetterSpacing="1" Margin="0,6,0,0"/>
+
+                            <StackPanel Spacing="3">
+                                <TextBlock Text="RSI (14)" FontSize="8" FontWeight="Bold" Foreground="#2A3040"/>
+                                <Grid ColumnDefinitions="*,10,*">
+                                    <TextBox Grid.Column="0" x:Name="RSIMin" PlaceholderText="Min" FontSize="11" Height="26" Padding="6,4" TextChanged="OnRangeChanged"/>
+                                    <TextBlock Grid.Column="1" Text="—" VerticalAlignment="Center" HorizontalAlignment="Center" Foreground="#2A3040" FontSize="11"/>
+                                    <TextBox Grid.Column="2" x:Name="RSIMax" PlaceholderText="Max" FontSize="11" Height="26" Padding="6,4" TextChanged="OnRangeChanged"/>
+                                </Grid>
+                                <StackPanel Orientation="Horizontal" Spacing="4">
+                                    <Button Classes="FilterChip" Content="Oversold &lt;30" Click="OnRSIPreset" Tag="0,30"/>
+                                    <Button Classes="FilterChip" Content="Neutral 30-70"   Click="OnRSIPreset" Tag="30,70"/>
+                                    <Button Classes="FilterChip" Content="O'bought &gt;70"  Click="OnRSIPreset" Tag="70,100"/>
+                                </StackPanel>
+                            </StackPanel>
+
+                            <StackPanel Spacing="3">
+                                <TextBlock Text="MACD SIGNAL" FontSize="8" FontWeight="Bold" Foreground="#2A3040"/>
+                                <ComboBox x:Name="MACDFilter" SelectedIndex="0" FontSize="11" Height="26" HorizontalAlignment="Stretch">
+                                    <ComboBoxItem Content="Any"/>
+                                    <ComboBoxItem Content="MACD above Signal (bullish)"/>
+                                    <ComboBoxItem Content="MACD below Signal (bearish)"/>
+                                    <ComboBoxItem Content="Bullish crossover (recent)"/>
+                                    <ComboBoxItem Content="Bearish crossover (recent)"/>
+                                </ComboBox>
+                            </StackPanel>
+
+                            <StackPanel Spacing="3">
+                                <TextBlock Text="STOCHASTIC RSI" FontSize="8" FontWeight="Bold" Foreground="#2A3040"/>
+                                <Grid ColumnDefinitions="*,10,*">
+                                    <TextBox Grid.Column="0" x:Name="StochRSIMin" PlaceholderText="Min" FontSize="11" Height="26" Padding="6,4" TextChanged="OnRangeChanged"/>
+                                    <TextBlock Grid.Column="1" Text="—" VerticalAlignment="Center" HorizontalAlignment="Center" Foreground="#2A3040" FontSize="11"/>
+                                    <TextBox Grid.Column="2" x:Name="StochRSIMax" PlaceholderText="Max" FontSize="11" Height="26" Padding="6,4" TextChanged="OnRangeChanged"/>
+                                </Grid>
+                            </StackPanel>
+
+                            <!-- Sub: Volume & Volatility -->
+                            <TextBlock Text="VOLUME &amp; VOLATILITY" FontSize="7" FontWeight="Bold"
+                                       Foreground="#1C2030" LetterSpacing="1" Margin="0,6,0,0"/>
+
+                            <StackPanel Spacing="3">
+                                <TextBlock Text="VOLUME vs 20D AVG" FontSize="8" FontWeight="Bold" Foreground="#2A3040"/>
+                                <ComboBox x:Name="VolumeFilter" SelectedIndex="0" FontSize="11" Height="26" HorizontalAlignment="Stretch">
+                                    <ComboBoxItem Content="Any"/>
+                                    <ComboBoxItem Content="&gt; 50% of average"/>
+                                    <ComboBoxItem Content="Average (80–120%)"/>
+                                    <ComboBoxItem Content="&gt; 150% (elevated)"/>
+                                    <ComboBoxItem Content="&gt; 200% (high volume)"/>
+                                    <ComboBoxItem Content="&gt; 300% (surge)"/>
+                                </ComboBox>
+                            </StackPanel>
+
+                            <StackPanel Spacing="3">
+                                <TextBlock Text="BETA" FontSize="8" FontWeight="Bold" Foreground="#2A3040"/>
+                                <Grid ColumnDefinitions="*,10,*">
+                                    <TextBox Grid.Column="0" x:Name="BetaMin" PlaceholderText="Min" FontSize="11" Height="26" Padding="6,4" TextChanged="OnRangeChanged"/>
+                                    <TextBlock Grid.Column="1" Text="—" VerticalAlignment="Center" HorizontalAlignment="Center" Foreground="#2A3040" FontSize="11"/>
+                                    <TextBox Grid.Column="2" x:Name="BetaMax" PlaceholderText="Max" FontSize="11" Height="26" Padding="6,4" TextChanged="OnRangeChanged"/>
+                                </Grid>
+                            </StackPanel>
+
+                            <StackPanel Spacing="3">
+                                <TextBlock Text="ATR % (14D)" FontSize="8" FontWeight="Bold" Foreground="#2A3040"/>
+                                <Grid ColumnDefinitions="*,10,*">
+                                    <TextBox Grid.Column="0" x:Name="ATRMin" PlaceholderText="Min %" FontSize="11" Height="26" Padding="6,4" TextChanged="OnRangeChanged"/>
+                                    <TextBlock Grid.Column="1" Text="—" VerticalAlignment="Center" HorizontalAlignment="Center" Foreground="#2A3040" FontSize="11"/>
+                                    <TextBox Grid.Column="2" x:Name="ATRMax" PlaceholderText="Max %" FontSize="11" Height="26" Padding="6,4" TextChanged="OnRangeChanged"/>
+                                </Grid>
+                            </StackPanel>
+
+                            <StackPanel Spacing="3">
+                                <TextBlock Text="RELATIVE STRENGTH vs SPY %" FontSize="8" FontWeight="Bold" Foreground="#2A3040"/>
+                                <Grid ColumnDefinitions="*,10,*">
+                                    <TextBox Grid.Column="0" x:Name="RSvsSpyMin" PlaceholderText="Min %" FontSize="11" Height="26" Padding="6,4" TextChanged="OnRangeChanged"/>
+                                    <TextBlock Grid.Column="1" Text="—" VerticalAlignment="Center" HorizontalAlignment="Center" Foreground="#2A3040" FontSize="11"/>
+                                    <TextBox Grid.Column="2" x:Name="RSvsSpyMax" PlaceholderText="Max %" FontSize="11" Height="26" Padding="6,4" TextChanged="OnRangeChanged"/>
+                                </Grid>
+                            </StackPanel>
+
+                        </StackPanel>
+
+                        <!-- ▶ OPTIONS ──────────────────────────────────── -->
+                        <Button Classes="SectionHeader" Click="OnToggleOptions">
+                            <Grid ColumnDefinitions="Auto,*">
+                                <TextBlock Grid.Column="0" x:Name="OptChevron"
+                                           Text="▶" FontSize="8" Foreground="#FF9500"
+                                           VerticalAlignment="Center" Margin="0,0,7,0"/>
+                                <TextBlock Grid.Column="1" Text="OPTIONS"
+                                           FontSize="9" FontWeight="Bold" Foreground="#FF9500"
+                                           LetterSpacing="1" VerticalAlignment="Center"/>
+                            </Grid>
+                        </Button>
+
+                        <StackPanel x:Name="OptionsContent" IsVisible="False"
+                                    Margin="16,10,16,14" Spacing="10">
+
+                            <!-- Has options toggle -->
+                            <StackPanel Spacing="5">
+                                <TextBlock Text="REQUIRE" FontSize="8" FontWeight="Bold" Foreground="#2A3040"/>
+                                <StackPanel Orientation="Horizontal" Spacing="6">
+                                    <Button x:Name="HasOptionsChip" Classes="FilterChip" Content="Has Listed Options" Click="OnChipToggle"/>
+                                    <Button x:Name="WeeklyOptChip"  Classes="FilterChip" Content="Weekly Options"     Click="OnChipToggle"/>
+                                </StackPanel>
+                            </StackPanel>
+
+                            <!-- Sub: IV Metrics -->
+                            <TextBlock Text="IMPLIED VOLATILITY" FontSize="7" FontWeight="Bold"
+                                       Foreground="#1C2030" LetterSpacing="1" Margin="0,4,0,0"/>
+
+                            <StackPanel Spacing="3">
+                                <TextBlock Text="IMPLIED VOLATILITY %" FontSize="8" FontWeight="Bold" Foreground="#2A3040"/>
+                                <Grid ColumnDefinitions="*,10,*">
+                                    <TextBox Grid.Column="0" x:Name="IVMin" PlaceholderText="Min %" FontSize="11" Height="26" Padding="6,4" TextChanged="OnRangeChanged"/>
+                                    <TextBlock Grid.Column="1" Text="—" VerticalAlignment="Center" HorizontalAlignment="Center" Foreground="#2A3040" FontSize="11"/>
+                                    <TextBox Grid.Column="2" x:Name="IVMax" PlaceholderText="Max %" FontSize="11" Height="26" Padding="6,4" TextChanged="OnRangeChanged"/>
+                                </Grid>
+                            </StackPanel>
+
+                            <StackPanel Spacing="3">
+                                <TextBlock Text="IV RANK (0–100)" FontSize="8" FontWeight="Bold" Foreground="#2A3040"/>
+                                <Grid ColumnDefinitions="*,10,*">
+                                    <TextBox Grid.Column="0" x:Name="IVRankMin" PlaceholderText="Min" FontSize="11" Height="26" Padding="6,4" TextChanged="OnRangeChanged"/>
+                                    <TextBlock Grid.Column="1" Text="—" VerticalAlignment="Center" HorizontalAlignment="Center" Foreground="#2A3040" FontSize="11"/>
+                                    <TextBox Grid.Column="2" x:Name="IVRankMax" PlaceholderText="Max" FontSize="11" Height="26" Padding="6,4" TextChanged="OnRangeChanged"/>
+                                </Grid>
+                                <StackPanel Orientation="Horizontal" Spacing="4">
+                                    <Button Classes="FilterChip" Content="Low &lt;30"    Click="OnIVRankPreset" Tag="0,30"/>
+                                    <Button Classes="FilterChip" Content="Mid 30-70"     Click="OnIVRankPreset" Tag="30,70"/>
+                                    <Button Classes="FilterChip" Content="High &gt;70"   Click="OnIVRankPreset" Tag="70,100"/>
+                                </StackPanel>
+                            </StackPanel>
+
+                            <StackPanel Spacing="3">
+                                <TextBlock Text="IV PERCENTILE (0–100)" FontSize="8" FontWeight="Bold" Foreground="#2A3040"/>
+                                <Grid ColumnDefinitions="*,10,*">
+                                    <TextBox Grid.Column="0" x:Name="IVPctMin" PlaceholderText="Min" FontSize="11" Height="26" Padding="6,4" TextChanged="OnRangeChanged"/>
+                                    <TextBlock Grid.Column="1" Text="—" VerticalAlignment="Center" HorizontalAlignment="Center" Foreground="#2A3040" FontSize="11"/>
+                                    <TextBox Grid.Column="2" x:Name="IVPctMax" PlaceholderText="Max" FontSize="11" Height="26" Padding="6,4" TextChanged="OnRangeChanged"/>
+                                </Grid>
+                            </StackPanel>
+
+                            <!-- Sub: Flow -->
+                            <TextBlock Text="OPTIONS FLOW" FontSize="7" FontWeight="Bold"
+                                       Foreground="#1C2030" LetterSpacing="1" Margin="0,6,0,0"/>
+
+                            <StackPanel Spacing="3">
+                                <TextBlock Text="PUT/CALL VOLUME RATIO" FontSize="8" FontWeight="Bold" Foreground="#2A3040"/>
+                                <Grid ColumnDefinitions="*,10,*">
+                                    <TextBox Grid.Column="0" x:Name="PCVolMin" PlaceholderText="Min" FontSize="11" Height="26" Padding="6,4" TextChanged="OnRangeChanged"/>
+                                    <TextBlock Grid.Column="1" Text="—" VerticalAlignment="Center" HorizontalAlignment="Center" Foreground="#2A3040" FontSize="11"/>
+                                    <TextBox Grid.Column="2" x:Name="PCVolMax" PlaceholderText="Max" FontSize="11" Height="26" Padding="6,4" TextChanged="OnRangeChanged"/>
+                                </Grid>
+                            </StackPanel>
+
+                            <StackPanel Spacing="3">
+                                <TextBlock Text="PUT/CALL OI RATIO" FontSize="8" FontWeight="Bold" Foreground="#2A3040"/>
+                                <Grid ColumnDefinitions="*,10,*">
+                                    <TextBox Grid.Column="0" x:Name="PCOIMin" PlaceholderText="Min" FontSize="11" Height="26" Padding="6,4" TextChanged="OnRangeChanged"/>
+                                    <TextBlock Grid.Column="1" Text="—" VerticalAlignment="Center" HorizontalAlignment="Center" Foreground="#2A3040" FontSize="11"/>
+                                    <TextBox Grid.Column="2" x:Name="PCOIMax" PlaceholderText="Max" FontSize="11" Height="26" Padding="6,4" TextChanged="OnRangeChanged"/>
+                                </Grid>
+                            </StackPanel>
+
+                            <StackPanel Spacing="3">
+                                <TextBlock Text="AVG DAILY OPTION VOL (MIN)" FontSize="8" FontWeight="Bold" Foreground="#2A3040"/>
+                                <TextBox x:Name="AvgOptVolMin" PlaceholderText="e.g. 1000" FontSize="11" Height="26" Padding="6,4" TextChanged="OnRangeChanged"/>
+                            </StackPanel>
+
+                        </StackPanel>
+
+                        <!-- ▶ DIVIDENDS ──────────────────────────────────── -->
+                        <Button Classes="SectionHeader" Click="OnToggleDividends">
+                            <Grid ColumnDefinitions="Auto,*">
+                                <TextBlock Grid.Column="0" x:Name="DivChevron"
+                                           Text="▶" FontSize="8" Foreground="#FF9500"
+                                           VerticalAlignment="Center" Margin="0,0,7,0"/>
+                                <TextBlock Grid.Column="1" Text="DIVIDENDS"
+                                           FontSize="9" FontWeight="Bold" Foreground="#FF9500"
+                                           LetterSpacing="1" VerticalAlignment="Center"/>
+                            </Grid>
+                        </Button>
+
+                        <StackPanel x:Name="DividendsContent" IsVisible="False"
+                                    Margin="16,10,16,14" Spacing="10">
+
+                            <StackPanel Spacing="5">
+                                <TextBlock Text="REQUIRE" FontSize="8" FontWeight="Bold" Foreground="#2A3040"/>
+                                <StackPanel Orientation="Horizontal" Spacing="6">
+                                    <Button x:Name="PaysDividendChip" Classes="FilterChip" Content="Pays Dividend" Click="OnChipToggle"/>
+                                    <Button x:Name="DivGrowthChip"    Classes="FilterChip" Content="Growing Div."  Click="OnChipToggle"/>
+                                </StackPanel>
+                            </StackPanel>
+
+                            <!-- Sub: Yield & Payout -->
+                            <TextBlock Text="YIELD &amp; PAYOUT" FontSize="7" FontWeight="Bold"
+                                       Foreground="#1C2030" LetterSpacing="1" Margin="0,4,0,0"/>
+
+                            <StackPanel Spacing="3">
+                                <TextBlock Text="DIVIDEND YIELD %" FontSize="8" FontWeight="Bold" Foreground="#2A3040"/>
+                                <Grid ColumnDefinitions="*,10,*">
+                                    <TextBox Grid.Column="0" x:Name="DivYieldMin" PlaceholderText="Min %" FontSize="11" Height="26" Padding="6,4" TextChanged="OnRangeChanged"/>
+                                    <TextBlock Grid.Column="1" Text="—" VerticalAlignment="Center" HorizontalAlignment="Center" Foreground="#2A3040" FontSize="11"/>
+                                    <TextBox Grid.Column="2" x:Name="DivYieldMax" PlaceholderText="Max %" FontSize="11" Height="26" Padding="6,4" TextChanged="OnRangeChanged"/>
+                                </Grid>
+                            </StackPanel>
+
+                            <StackPanel Spacing="3">
+                                <TextBlock Text="PAYOUT RATIO %" FontSize="8" FontWeight="Bold" Foreground="#2A3040"/>
+                                <Grid ColumnDefinitions="*,10,*">
+                                    <TextBox Grid.Column="0" x:Name="PayoutMin" PlaceholderText="Min %" FontSize="11" Height="26" Padding="6,4" TextChanged="OnRangeChanged"/>
+                                    <TextBlock Grid.Column="1" Text="—" VerticalAlignment="Center" HorizontalAlignment="Center" Foreground="#2A3040" FontSize="11"/>
+                                    <TextBox Grid.Column="2" x:Name="PayoutMax" PlaceholderText="Max %" FontSize="11" Height="26" Padding="6,4" TextChanged="OnRangeChanged"/>
+                                </Grid>
+                            </StackPanel>
+
+                            <!-- Sub: Growth & Safety -->
+                            <TextBlock Text="GROWTH &amp; SAFETY" FontSize="7" FontWeight="Bold"
+                                       Foreground="#1C2030" LetterSpacing="1" Margin="0,6,0,0"/>
+
+                            <StackPanel Spacing="3">
+                                <TextBlock Text="DIV GROWTH 5Y CAGR %" FontSize="8" FontWeight="Bold" Foreground="#2A3040"/>
+                                <Grid ColumnDefinitions="*,10,*">
+                                    <TextBox Grid.Column="0" x:Name="DivGrowthMin" PlaceholderText="Min %" FontSize="11" Height="26" Padding="6,4" TextChanged="OnRangeChanged"/>
+                                    <TextBlock Grid.Column="1" Text="—" VerticalAlignment="Center" HorizontalAlignment="Center" Foreground="#2A3040" FontSize="11"/>
+                                    <TextBox Grid.Column="2" x:Name="DivGrowthMax" PlaceholderText="Max %" FontSize="11" Height="26" Padding="6,4" TextChanged="OnRangeChanged"/>
+                                </Grid>
+                            </StackPanel>
+
+                            <StackPanel Spacing="3">
+                                <TextBlock Text="CONSECUTIVE GROWTH YEARS (MIN)" FontSize="8" FontWeight="Bold" Foreground="#2A3040"/>
+                                <TextBox x:Name="DivStreakMin" PlaceholderText="e.g. 5" FontSize="11" Height="26" Padding="6,4" TextChanged="OnRangeChanged"/>
+                            </StackPanel>
+
+                            <StackPanel Spacing="3">
+                                <TextBlock Text="EX-DIVIDEND WITHIN N DAYS" FontSize="8" FontWeight="Bold" Foreground="#2A3040"/>
+                                <TextBox x:Name="ExDivDays" PlaceholderText="e.g. 30" FontSize="11" Height="26" Padding="6,4" TextChanged="OnRangeChanged"/>
+                            </StackPanel>
+
+                        </StackPanel>
+
+                        <!-- ▶ SENTIMENT ──────────────────────────────────── -->
+                        <Button Classes="SectionHeader" Click="OnToggleSentiment">
+                            <Grid ColumnDefinitions="Auto,*">
+                                <TextBlock Grid.Column="0" x:Name="SentChevron"
+                                           Text="▶" FontSize="8" Foreground="#FF9500"
+                                           VerticalAlignment="Center" Margin="0,0,7,0"/>
+                                <TextBlock Grid.Column="1" Text="SENTIMENT"
+                                           FontSize="9" FontWeight="Bold" Foreground="#FF9500"
+                                           LetterSpacing="1" VerticalAlignment="Center"/>
+                            </Grid>
+                        </Button>
+
+                        <StackPanel x:Name="SentimentContent" IsVisible="False"
+                                    Margin="16,10,16,14" Spacing="10">
+
+                            <!-- Sub: Analyst Coverage -->
+                            <TextBlock Text="ANALYST COVERAGE" FontSize="7" FontWeight="Bold"
+                                       Foreground="#1C2030" LetterSpacing="1" Margin="0,4,0,0"/>
+
+                            <StackPanel Spacing="3">
+                                <TextBlock Text="CONSENSUS RATING" FontSize="8" FontWeight="Bold" Foreground="#2A3040"/>
+                                <ComboBox x:Name="AnalystFilter" SelectedIndex="0" FontSize="11" Height="26" HorizontalAlignment="Stretch">
+                                    <ComboBoxItem Content="Any Rating"/>
+                                    <ComboBoxItem Content="Strong Buy"/>
+                                    <ComboBoxItem Content="Buy or better"/>
+                                    <ComboBoxItem Content="Hold"/>
+                                    <ComboBoxItem Content="Sell or worse"/>
+                                    <ComboBoxItem Content="Strong Sell"/>
+                                </ComboBox>
+                            </StackPanel>
+
+                            <StackPanel Spacing="3">
+                                <TextBlock Text="PRICE TARGET UPSIDE % (MIN)" FontSize="8" FontWeight="Bold" Foreground="#2A3040"/>
+                                <TextBox x:Name="PTUpsideMin" PlaceholderText="e.g. 15" FontSize="11" Height="26" Padding="6,4" TextChanged="OnRangeChanged"/>
+                            </StackPanel>
+
+                            <!-- Sub: Ownership -->
+                            <TextBlock Text="OWNERSHIP" FontSize="7" FontWeight="Bold"
+                                       Foreground="#1C2030" LetterSpacing="1" Margin="0,6,0,0"/>
+
+                            <StackPanel Spacing="3">
+                                <TextBlock Text="INSTITUTIONAL OWNERSHIP %" FontSize="8" FontWeight="Bold" Foreground="#2A3040"/>
+                                <Grid ColumnDefinitions="*,10,*">
+                                    <TextBox Grid.Column="0" x:Name="InstOwnMin" PlaceholderText="Min %" FontSize="11" Height="26" Padding="6,4" TextChanged="OnRangeChanged"/>
+                                    <TextBlock Grid.Column="1" Text="—" VerticalAlignment="Center" HorizontalAlignment="Center" Foreground="#2A3040" FontSize="11"/>
+                                    <TextBox Grid.Column="2" x:Name="InstOwnMax" PlaceholderText="Max %" FontSize="11" Height="26" Padding="6,4" TextChanged="OnRangeChanged"/>
+                                </Grid>
+                            </StackPanel>
+
+                            <StackPanel Spacing="3">
+                                <TextBlock Text="SHORT FLOAT %" FontSize="8" FontWeight="Bold" Foreground="#2A3040"/>
+                                <Grid ColumnDefinitions="*,10,*">
+                                    <TextBox Grid.Column="0" x:Name="ShortFloatMin" PlaceholderText="Min %" FontSize="11" Height="26" Padding="6,4" TextChanged="OnRangeChanged"/>
+                                    <TextBlock Grid.Column="1" Text="—" VerticalAlignment="Center" HorizontalAlignment="Center" Foreground="#2A3040" FontSize="11"/>
+                                    <TextBox Grid.Column="2" x:Name="ShortFloatMax" PlaceholderText="Max %" FontSize="11" Height="26" Padding="6,4" TextChanged="OnRangeChanged"/>
+                                </Grid>
+                            </StackPanel>
+
+                            <StackPanel Spacing="3">
+                                <TextBlock Text="INSIDER ACTIVITY" FontSize="8" FontWeight="Bold" Foreground="#2A3040"/>
+                                <ComboBox x:Name="InsiderFilter" SelectedIndex="0" FontSize="11" Height="26" HorizontalAlignment="Stretch">
+                                    <ComboBoxItem Content="Any"/>
+                                    <ComboBoxItem Content="Net buying (last 90d)"/>
+                                    <ComboBoxItem Content="Net selling (last 90d)"/>
+                                    <ComboBoxItem Content="No activity"/>
+                                </ComboBox>
+                            </StackPanel>
+
+                            <StackPanel Spacing="3">
+                                <TextBlock Text="EARNINGS SURPRISE (LAST QTR %)" FontSize="8" FontWeight="Bold" Foreground="#2A3040"/>
+                                <Grid ColumnDefinitions="*,10,*">
+                                    <TextBox Grid.Column="0" x:Name="EarnSurpriseMin" PlaceholderText="Min %" FontSize="11" Height="26" Padding="6,4" TextChanged="OnRangeChanged"/>
+                                    <TextBlock Grid.Column="1" Text="—" VerticalAlignment="Center" HorizontalAlignment="Center" Foreground="#2A3040" FontSize="11"/>
+                                    <TextBox Grid.Column="2" x:Name="EarnSurpriseMax" PlaceholderText="Max %" FontSize="11" Height="26" Padding="6,4" TextChanged="OnRangeChanged"/>
+                                </Grid>
+                            </StackPanel>
+
+                        </StackPanel>
+
+                        <!-- bottom padding -->
+                        <Border Height="20"/>
+
+                    </StackPanel>
+                </ScrollViewer>
+
+            </Grid>
+        </Border>
+
+        <Rectangle Grid.Column="1" Fill="#141820"/>
+
+        <!-- ════════════════════════════════════════════════════════════
+             RIGHT — Results Area
+             ════════════════════════════════════════════════════════════ -->
+        <Grid Grid.Column="2" RowDefinitions="52,1,36,1,34,1,*">
+
+            <!-- Header row -->
+            <Grid Grid.Row="0" Margin="20,0,20,0"
+                  ColumnDefinitions="Auto,16,*,10,Auto,8,Auto,8,Auto">
+
+                <!-- Title -->
+                <StackPanel Grid.Column="0" VerticalAlignment="Center" Spacing="1">
+                    <TextBlock Text="SCREENER"
+                               FontSize="14" FontWeight="Black"
+                               Foreground="#EBFFFF" LetterSpacing="1"/>
+                    <TextBlock Text="configure filters and run"
+                               FontSize="10" Foreground="#2A3A50"/>
+                </StackPanel>
+
+                <!-- Presets dropdown -->
+                <ComboBox Grid.Column="2"
+                          x:Name="PresetCombo"
+                          SelectedIndex="0"
+                          FontSize="11"
+                          VerticalAlignment="Center"
+                          HorizontalAlignment="Stretch"
+                          SelectionChanged="OnPresetSelected">
+                    <ComboBoxItem Content="— Custom screen —"/>
+                    <ComboBoxItem Content="Value + Quality  (low P/E, high ROE, low debt)"/>
+                    <ComboBoxItem Content="Dividend Growth  (yield &gt;2%, streak &gt;5yr, payout &lt;60%)"/>
+                    <ComboBoxItem Content="Momentum Breakout  (above 200 SMA, RS &gt; SPY)"/>
+                    <ComboBoxItem Content="Options Premium Hunter  (IV Rank &gt;50, liquid options)"/>
+                    <ComboBoxItem Content="Oversold Value  (RSI &lt;35, P/E &lt;20, above 200 SMA)"/>
+                    <ComboBoxItem Content="High Growth  (Rev growth &gt;20%, EPS growth &gt;15%)"/>
+                    <ComboBoxItem Content="Low Volatility Income  (Beta &lt;0.8, Yield &gt;2%)"/>
+                </ComboBox>
+
+                <!-- Save -->
+                <Button Grid.Column="4" Classes="SmallBtn"
+                        Content="SAVE SCREEN"
+                        VerticalAlignment="Center"
+                        Click="OnSaveScreen"/>
+
+                <!-- Run -->
+                <Button Grid.Column="6" Classes="RunBtn"
+                        Content="▶  RUN SCREEN"
+                        VerticalAlignment="Center"
+                        Click="OnRunScreen"/>
+
+            </Grid>
+
+            <Rectangle Grid.Row="1" Fill="#141820"/>
+
+            <!-- Stats bar -->
+            <Grid Grid.Row="2" Margin="20,0,20,0"
+                  ColumnDefinitions="Auto,12,Auto,*,Auto">
+                <TextBlock Grid.Column="0" x:Name="ResultsCountLabel"
+                           Text="Configure filters, then click ▶ RUN SCREEN"
+                           FontSize="11" Foreground="#2A3040"
+                           VerticalAlignment="Center"/>
+                <Rectangle Grid.Column="1" Width="1" Height="12" Fill="#1A2030"
+                           VerticalAlignment="Center"/>
+                <TextBlock Grid.Column="2" x:Name="LastRunLabel"
+                           Text=""
+                           FontSize="10" Foreground="#1A2030"
+                           VerticalAlignment="Center"/>
+                <Button Grid.Column="4" Classes="SmallBtn"
+                        Content="≡  COLUMNS"
+                        VerticalAlignment="Center"
+                        Click="OnConfigureColumns"/>
+            </Grid>
+
+            <Rectangle Grid.Row="3" Fill="#141820"/>
+
+            <!-- Column headers -->
+            <Grid Grid.Row="4" ColumnDefinitions="72,*,100,80,58,66,66,52,62,58"
+                  Margin="20,0,20,0">
+                <Button Grid.Column="0" Classes="ColHeader" Content="SYMBOL"    Tag="symbol"    Click="OnSortColumn" Margin="4,0,0,0"/>
+                <Button Grid.Column="1" Classes="ColHeader" Content="COMPANY"   Tag="company"   Click="OnSortColumn"/>
+                <Button Grid.Column="2" Classes="ColHeader" Content="SECTOR"    Tag="sector"    Click="OnSortColumn"/>
+                <Button Grid.Column="3" Classes="ColHeader" Content="MKT CAP"   Tag="mktcap"   Click="OnSortColumn"/>
+                <Button Grid.Column="4" Classes="ColHeader" Content="P/E"       Tag="pe"        Click="OnSortColumn"/>
+                <Button Grid.Column="5" Classes="ColHeader" Content="FWD P/E"   Tag="fwdpe"     Click="OnSortColumn"/>
+                <Button Grid.Column="6" Classes="ColHeader" Content="DIV YLD"   Tag="divyield"  Click="OnSortColumn"/>
+                <Button Grid.Column="7" Classes="ColHeader" Content="RSI"       Tag="rsi"       Click="OnSortColumn"/>
+                <Button Grid.Column="8" Classes="ColHeader" Content="IV RANK"   Tag="ivrank"    Click="OnSortColumn"/>
+                <Button Grid.Column="9" Classes="ColHeader SortDesc" Content="SCORE ▼" Tag="score" Click="OnSortColumn"/>
+            </Grid>
+
+            <Rectangle Grid.Row="5" Fill="#141820"/>
+
+            <!-- Results -->
+            <Grid Grid.Row="6">
+
+                <!-- Results list -->
+                <ListBox x:Name="ResultsList"
+                         Background="Transparent"
+                         BorderThickness="0"
+                         Margin="12,0,12,0"
+                         IsVisible="False"
+                         SelectionChanged="OnResultSelected">
+                    <ListBox.Styles>
+                        <Style Selector="ListBoxItem">
+                            <Setter Property="Padding" Value="8,0"/>
+                            <Setter Property="Background" Value="Transparent"/>
+                            <Setter Property="Height" Value="34"/>
+                            <Setter Property="Cursor" Value="Hand"/>
+                        </Style>
+                        <Style Selector="ListBoxItem:pointerover /template/ ContentPresenter">
+                            <Setter Property="Background" Value="#0C1018"/>
+                        </Style>
+                        <Style Selector="ListBoxItem:selected /template/ ContentPresenter">
+                            <Setter Property="Background" Value="#0F1A10"/>
+                        </Style>
+                    </ListBox.Styles>
+                    <ListBox.ItemTemplate>
+                        <DataTemplate x:DataType="local:ScreenerRow">
+                            <Grid ColumnDefinitions="72,*,100,80,58,66,66,52,62,58">
+                                <TextBlock Grid.Column="0" Text="{Binding Symbol}"
+                                           FontSize="13" FontWeight="SemiBold" Foreground="#EBFFFF"
+                                           VerticalAlignment="Center" Margin="4,0,0,0"/>
+                                <TextBlock Grid.Column="1" Text="{Binding Company}"
+                                           FontSize="12" Foreground="#8090A8"
+                                           VerticalAlignment="Center"
+                                           TextTrimming="CharacterEllipsis"/>
+                                <TextBlock Grid.Column="2" Text="{Binding Sector}"
+                                           FontSize="11" Foreground="#4A5A70"
+                                           VerticalAlignment="Center"
+                                           TextTrimming="CharacterEllipsis"/>
+                                <TextBlock Grid.Column="3" Text="{Binding MktCap}"
+                                           FontSize="11" Foreground="#EBFFFF"
+                                           VerticalAlignment="Center"/>
+                                <TextBlock Grid.Column="4" Text="{Binding PE}"
+                                           FontSize="11" Foreground="{Binding PEColor}"
+                                           VerticalAlignment="Center"/>
+                                <TextBlock Grid.Column="5" Text="{Binding FwdPE}"
+                                           FontSize="11" Foreground="{Binding FwdPEColor}"
+                                           VerticalAlignment="Center"/>
+                                <TextBlock Grid.Column="6" Text="{Binding DivYield}"
+                                           FontSize="11" Foreground="{Binding DivColor}"
+                                           VerticalAlignment="Center"/>
+                                <TextBlock Grid.Column="7" Text="{Binding RSI}"
+                                           FontSize="11" FontWeight="SemiBold"
+                                           Foreground="{Binding RSIColor}"
+                                           VerticalAlignment="Center"/>
+                                <TextBlock Grid.Column="8" Text="{Binding IVRank}"
+                                           FontSize="11" Foreground="{Binding IVRankColor}"
+                                           VerticalAlignment="Center"/>
+                                <Border Grid.Column="9"
+                                        Background="{Binding ScoreBg}"
+                                        CornerRadius="3"
+                                        Padding="6,2"
+                                        HorizontalAlignment="Left"
+                                        VerticalAlignment="Center">
+                                    <TextBlock Text="{Binding Score}"
+                                               FontSize="10" FontWeight="Bold"
+                                               Foreground="{Binding ScoreFg}"/>
+                                </Border>
+                            </Grid>
+                        </DataTemplate>
+                    </ListBox.ItemTemplate>
+                </ListBox>
+
+                <!-- Empty state -->
+                <StackPanel x:Name="ResultsEmpty"
+                            VerticalAlignment="Center"
+                            HorizontalAlignment="Center"
+                            Spacing="12" Margin="0,0,0,40">
+                    <TextBlock Text="No screen has been run yet."
+                               FontSize="16" FontWeight="SemiBold"
+                               Foreground="#1A2530"
+                               HorizontalAlignment="Center"/>
+                    <TextBlock Text="Set your filters on the left, then click ▶ RUN SCREEN."
+                               FontSize="12" Foreground="#111C28"
+                               HorizontalAlignment="Center"/>
+                    <TextBlock Text="Results are ranked by a composite score (value + momentum + quality)."
+                               FontSize="11" Foreground="#0E1820"
+                               HorizontalAlignment="Center"/>
+                </StackPanel>
+
+                <!-- No results state (after a run with 0 results) -->
+                <StackPanel x:Name="NoResultsState"
+                            IsVisible="False"
+                            VerticalAlignment="Center"
+                            HorizontalAlignment="Center"
+                            Spacing="10" Margin="0,0,0,40">
+                    <TextBlock Text="No matches found."
+                               FontSize="16" FontWeight="SemiBold"
+                               Foreground="#1A2530"
+                               HorizontalAlignment="Center"/>
+                    <TextBlock Text="Try relaxing your filters or selecting a different preset."
+                               FontSize="12" Foreground="#111C28"
+                               HorizontalAlignment="Center"/>
+                </StackPanel>
+
+            </Grid>
+
+        </Grid>
+
+    </Grid>
+</UserControl>

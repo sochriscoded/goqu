@@ -1,0 +1,588 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:local="clr-namespace:goqu.Views.EdgeDiscovery"
+             x:Class="goqu.Views.EdgeDiscovery.EdgeDiscoveryView"
+             Background="#060810">
+
+    <UserControl.Styles>
+        <Style Selector="Button.StatusChip">
+            <Setter Property="Background" Value="Transparent"/>
+            <Setter Property="Foreground" Value="#2A3240"/>
+            <Setter Property="BorderBrush" Value="Transparent"/>
+            <Setter Property="BorderThickness" Value="1"/>
+            <Setter Property="Padding" Value="8,3"/>
+            <Setter Property="FontSize" Value="9"/>
+            <Setter Property="FontWeight" Value="Bold"/>
+            <Setter Property="CornerRadius" Value="3"/>
+            <Setter Property="Cursor" Value="Hand"/>
+            <Setter Property="Template">
+                <ControlTemplate>
+                    <Border Background="{TemplateBinding Background}"
+                            BorderBrush="{TemplateBinding BorderBrush}"
+                            BorderThickness="{TemplateBinding BorderThickness}"
+                            CornerRadius="{TemplateBinding CornerRadius}"
+                            Padding="{TemplateBinding Padding}">
+                        <ContentPresenter Content="{TemplateBinding Content}"
+                                          HorizontalContentAlignment="Center"
+                                          VerticalContentAlignment="Center"
+                                          FontSize="{TemplateBinding FontSize}"
+                                          FontWeight="{TemplateBinding FontWeight}"
+                                          TextElement.Foreground="{TemplateBinding Foreground}"/>
+                    </Border>
+                </ControlTemplate>
+            </Setter>
+        </Style>
+        <Style Selector="Button.StatusChip.Active">
+            <Setter Property="Background" Value="#1C1A00"/>
+            <Setter Property="Foreground" Value="#FFE101"/>
+            <Setter Property="BorderBrush" Value="#3A3200"/>
+        </Style>
+        <Style Selector="Button.StatusChip:pointerover">
+            <Setter Property="Foreground" Value="#8090A8"/>
+        </Style>
+
+        <Style Selector="ListBoxItem">
+            <Setter Property="Padding" Value="0"/>
+            <Setter Property="Margin" Value="0"/>
+            <Setter Property="Background" Value="Transparent"/>
+            <Setter Property="Template">
+                <ControlTemplate>
+                    <Border Background="{TemplateBinding Background}"
+                            BorderBrush="#0A0D14" BorderThickness="0,0,0,1">
+                        <ContentPresenter Content="{TemplateBinding Content}"/>
+                    </Border>
+                </ControlTemplate>
+            </Setter>
+        </Style>
+        <Style Selector="ListBoxItem:selected /template/ Border">
+            <Setter Property="Background" Value="#0D1020"/>
+        </Style>
+        <Style Selector="ListBoxItem:pointerover /template/ Border">
+            <Setter Property="Background" Value="#0A0E1A"/>
+        </Style>
+
+        <Style Selector="TextBlock.SLabel">
+            <Setter Property="FontSize" Value="9"/>
+            <Setter Property="FontWeight" Value="Bold"/>
+            <Setter Property="Foreground" Value="#2A3240"/>
+            <Setter Property="LetterSpacing" Value="1"/>
+        </Style>
+
+        <Style Selector="Button.ActionBtn">
+            <Setter Property="Background" Value="Transparent"/>
+            <Setter Property="Foreground" Value="#4A5568"/>
+            <Setter Property="BorderBrush" Value="#1A2030"/>
+            <Setter Property="BorderThickness" Value="1"/>
+            <Setter Property="Padding" Value="10,5"/>
+            <Setter Property="FontSize" Value="10"/>
+            <Setter Property="FontWeight" Value="SemiBold"/>
+            <Setter Property="CornerRadius" Value="3"/>
+            <Setter Property="Cursor" Value="Hand"/>
+            <Setter Property="Template">
+                <ControlTemplate>
+                    <Border Background="{TemplateBinding Background}"
+                            BorderBrush="{TemplateBinding BorderBrush}"
+                            BorderThickness="{TemplateBinding BorderThickness}"
+                            CornerRadius="{TemplateBinding CornerRadius}"
+                            Padding="{TemplateBinding Padding}">
+                        <ContentPresenter Content="{TemplateBinding Content}"
+                                          HorizontalContentAlignment="Center"
+                                          VerticalContentAlignment="Center"
+                                          FontSize="{TemplateBinding FontSize}"
+                                          FontWeight="{TemplateBinding FontWeight}"
+                                          TextElement.Foreground="{TemplateBinding Foreground}"/>
+                    </Border>
+                </ControlTemplate>
+            </Setter>
+        </Style>
+        <Style Selector="Button.ActionBtn:pointerover">
+            <Setter Property="BorderBrush" Value="#2A3A4A"/>
+            <Setter Property="Foreground" Value="#8090A8"/>
+        </Style>
+
+        <Style Selector="Button.NewHypBtn">
+            <Setter Property="Background" Value="#1A1800"/>
+            <Setter Property="Foreground" Value="#FFE101"/>
+            <Setter Property="BorderBrush" Value="#383200"/>
+            <Setter Property="BorderThickness" Value="1"/>
+            <Setter Property="Padding" Value="0,8"/>
+            <Setter Property="FontSize" Value="11"/>
+            <Setter Property="FontWeight" Value="Bold"/>
+            <Setter Property="CornerRadius" Value="4"/>
+            <Setter Property="Cursor" Value="Hand"/>
+            <Setter Property="Template">
+                <ControlTemplate>
+                    <Border Background="{TemplateBinding Background}"
+                            BorderBrush="{TemplateBinding BorderBrush}"
+                            BorderThickness="{TemplateBinding BorderThickness}"
+                            CornerRadius="{TemplateBinding CornerRadius}"
+                            Padding="{TemplateBinding Padding}">
+                        <ContentPresenter Content="{TemplateBinding Content}"
+                                          HorizontalContentAlignment="Center"
+                                          VerticalContentAlignment="Center"
+                                          FontSize="{TemplateBinding FontSize}"
+                                          FontWeight="{TemplateBinding FontWeight}"
+                                          TextElement.Foreground="{TemplateBinding Foreground}"/>
+                    </Border>
+                </ControlTemplate>
+            </Setter>
+        </Style>
+        <Style Selector="Button.NewHypBtn:pointerover">
+            <Setter Property="Background" Value="#2A2200"/>
+            <Setter Property="BorderBrush" Value="#FFE101"/>
+        </Style>
+    </UserControl.Styles>
+
+    <Grid ColumnDefinitions="260,1,*">
+
+        <!-- ══ LEFT: Registry list ═══════════════════════════════════════════ -->
+        <Border Grid.Column="0" Background="#07090F">
+            <Grid RowDefinitions="Auto,Auto,Auto,1,*">
+
+                <!-- Header + new button -->
+                <StackPanel Grid.Row="0" Margin="14,16,14,0" Spacing="8">
+                    <StackPanel Orientation="Horizontal" Spacing="6">
+                        <Border Width="3" Height="13" Background="#FFE101" CornerRadius="1"/>
+                        <TextBlock Text="HYPOTHESIS REGISTRY"
+                                   FontSize="9" FontWeight="Bold"
+                                   Foreground="#FFE101" LetterSpacing="1"
+                                   VerticalAlignment="Center"/>
+                    </StackPanel>
+                    <Button Classes="NewHypBtn"
+                            Content="+ NEW HYPOTHESIS"
+                            HorizontalAlignment="Stretch"
+                            Click="OnNewHypothesis"/>
+                </StackPanel>
+
+                <!-- Search -->
+                <Border Grid.Row="1" Margin="10,8,10,4"
+                        Background="#09090F" BorderBrush="#141820" BorderThickness="1"
+                        CornerRadius="4" Padding="8,5">
+                    <Grid ColumnDefinitions="Auto,*">
+                        <TextBlock Grid.Column="0" Text="⌕" FontSize="12"
+                                   Foreground="#2A3240" VerticalAlignment="Center"
+                                   Margin="0,0,5,0"/>
+                        <TextBox Grid.Column="1" x:Name="HypothesisSearch"
+                                 Background="Transparent" BorderThickness="0"
+                                 Foreground="#8090A8" FontSize="11"
+                                 Watermark="search..."
+                                 TextChanged="OnSearchChanged"
+                                 VerticalAlignment="Center"/>
+                    </Grid>
+                </Border>
+
+                <!-- Status filter chips -->
+                <WrapPanel Grid.Row="2" Margin="10,0,10,8" Orientation="Horizontal">
+                    <Button x:Name="ChipAll"
+                            Classes="StatusChip Active"
+                            Content="ALL" Tag="all"
+                            Click="OnStatusFilter" Margin="2"/>
+                    <Button x:Name="ChipUntested"
+                            Classes="StatusChip"
+                            Content="UNTESTED" Tag="untested"
+                            Click="OnStatusFilter" Margin="2"/>
+                    <Button x:Name="ChipTesting"
+                            Classes="StatusChip"
+                            Content="TESTING" Tag="forward_testing"
+                            Click="OnStatusFilter" Margin="2"/>
+                    <Button x:Name="ChipValidated"
+                            Classes="StatusChip"
+                            Content="VALID" Tag="validated"
+                            Click="OnStatusFilter" Margin="2"/>
+                    <Button x:Name="ChipRejected"
+                            Classes="StatusChip"
+                            Content="REJECTED" Tag="rejected"
+                            Click="OnStatusFilter" Margin="2"/>
+                </WrapPanel>
+
+                <Rectangle Grid.Row="3" Fill="#0E1020"/>
+
+                <!-- List -->
+                <ScrollViewer Grid.Row="4" HorizontalScrollBarVisibility="Disabled">
+                    <ListBox x:Name="HypothesisList"
+                             Background="Transparent"
+                             SelectionChanged="OnHypothesisSelected">
+                        <ListBox.ItemTemplate>
+                            <DataTemplate DataType="local:HypothesisItem">
+                                <Grid ColumnDefinitions="4,*" Height="62">
+                                    <Rectangle Grid.Column="0" Fill="{Binding BarColor}"/>
+                                    <Grid Grid.Column="1" RowDefinitions="*,Auto" Margin="10,9,10,9">
+                                        <Grid Grid.Row="0" ColumnDefinitions="*,Auto">
+                                            <TextBlock Grid.Column="0"
+                                                       Text="{Binding Name}"
+                                                       FontSize="12" FontWeight="SemiBold"
+                                                       Foreground="#C8D8E8"
+                                                       TextTrimming="CharacterEllipsis"
+                                                       VerticalAlignment="Center"/>
+                                            <Border Grid.Column="1"
+                                                    Background="{Binding LabelBg}"
+                                                    CornerRadius="2" Padding="5,2"
+                                                    VerticalAlignment="Center">
+                                                <TextBlock Text="{Binding StatusLabel}"
+                                                           FontSize="8" FontWeight="Bold"
+                                                           Foreground="{Binding LabelColor}"/>
+                                            </Border>
+                                        </Grid>
+                                        <StackPanel Grid.Row="1" Orientation="Horizontal"
+                                                    Spacing="6" Margin="0,3,0,0">
+                                            <TextBlock Text="{Binding SignalType}"
+                                                       FontSize="10" Foreground="#2A3A4A"/>
+                                            <TextBlock Text="·" FontSize="10" Foreground="#1A2430"/>
+                                            <TextBlock Text="{Binding CreatedAt}"
+                                                       FontSize="10" Foreground="#1A2430"/>
+                                        </StackPanel>
+                                    </Grid>
+                                </Grid>
+                            </DataTemplate>
+                        </ListBox.ItemTemplate>
+                    </ListBox>
+                </ScrollViewer>
+
+            </Grid>
+        </Border>
+
+        <!-- Divider -->
+        <Rectangle Grid.Column="1" Fill="#0E1020"/>
+
+        <!-- ══ RIGHT: Overview / Detail ══════════════════════════════════════ -->
+        <ScrollViewer Grid.Column="2" HorizontalScrollBarVisibility="Disabled">
+            <Grid>
+
+                <!-- ── Overview panel ───────────────────────────────────────── -->
+                <StackPanel x:Name="OverviewPanel" Margin="36,28,36,28" Spacing="0">
+
+                    <StackPanel Spacing="4" Margin="0,0,0,22">
+                        <StackPanel Orientation="Horizontal" Spacing="10">
+                            <Border Width="4" Height="22" Background="#FFE101" CornerRadius="2"/>
+                            <TextBlock Text="EDGE DISCOVERY"
+                                       FontSize="20" FontWeight="Bold"
+                                       Foreground="#EBFFFF" VerticalAlignment="Center"/>
+                        </StackPanel>
+                        <TextBlock Text="falsify before you trust"
+                                   FontSize="12" Foreground="#2A3A4A" Margin="14,0,0,0"/>
+                    </StackPanel>
+
+                    <!-- KPI tiles -->
+                    <Grid ColumnDefinitions="*,12,*,12,*,12,*" Margin="0,0,0,20">
+                        <Border Grid.Column="0" Background="#08090E"
+                                BorderBrush="#141820" BorderThickness="1"
+                                CornerRadius="6" Padding="16,14">
+                            <StackPanel Spacing="4">
+                                <TextBlock x:Name="KpiTotal" Text="0"
+                                           FontSize="26" FontWeight="Bold"
+                                           Foreground="#EBFFFF"/>
+                                <TextBlock Text="HYPOTHESES" Classes="SLabel"/>
+                            </StackPanel>
+                        </Border>
+                        <Border Grid.Column="2" Background="#040F08"
+                                BorderBrush="#081A0C" BorderThickness="1"
+                                CornerRadius="6" Padding="16,14">
+                            <StackPanel Spacing="4">
+                                <TextBlock x:Name="KpiValidated" Text="0"
+                                           FontSize="26" FontWeight="Bold"
+                                           Foreground="#038C4C"/>
+                                <TextBlock Text="VALIDATED" Classes="SLabel"/>
+                            </StackPanel>
+                        </Border>
+                        <Border Grid.Column="4" Background="#000A18"
+                                BorderBrush="#001028" BorderThickness="1"
+                                CornerRadius="6" Padding="16,14">
+                            <StackPanel Spacing="4">
+                                <TextBlock x:Name="KpiTesting" Text="0"
+                                           FontSize="26" FontWeight="Bold"
+                                           Foreground="#0085CD"/>
+                                <TextBlock Text="TESTING" Classes="SLabel"/>
+                            </StackPanel>
+                        </Border>
+                        <Border Grid.Column="6" Background="#100508"
+                                BorderBrush="#200810" BorderThickness="1"
+                                CornerRadius="6" Padding="16,14">
+                            <StackPanel Spacing="4">
+                                <TextBlock x:Name="KpiRejected" Text="0"
+                                           FontSize="26" FontWeight="Bold"
+                                           Foreground="#BF1B1B"/>
+                                <TextBlock Text="REJECTED" Classes="SLabel"/>
+                            </StackPanel>
+                        </Border>
+                    </Grid>
+
+                    <!-- Multiple testing warning -->
+                    <Border Background="#0C0A00" BorderBrush="#3A3000"
+                            BorderThickness="1" CornerRadius="6"
+                            Padding="18,14" Margin="0,0,0,16">
+                        <StackPanel Spacing="10">
+                            <StackPanel Orientation="Horizontal" Spacing="8">
+                                <TextBlock Text="⚠" FontSize="14" Foreground="#FFE101"
+                                           VerticalAlignment="Center"/>
+                                <TextBlock Text="MULTIPLE TESTING"
+                                           FontSize="10" FontWeight="Bold"
+                                           Foreground="#FFE101" LetterSpacing="1"
+                                           VerticalAlignment="Center"/>
+                            </StackPanel>
+                            <TextBlock TextWrapping="Wrap" FontSize="12"
+                                       Foreground="#8090A8" LineHeight="18">
+Finding a pattern after exploring many hypotheses is not the same as having an edge. Every idea you test increases your expected false discoveries — even if each individual p-value looks convincing. Log rejected hypotheses too; the audit trail is your primary defence against fooling yourself.
+                            </TextBlock>
+                            <Grid ColumnDefinitions="*,16,*">
+                                <Border Grid.Column="0" Background="#0A0800"
+                                        BorderBrush="#2A2200" BorderThickness="1"
+                                        CornerRadius="4" Padding="12,8">
+                                    <StackPanel Spacing="2">
+                                        <TextBlock x:Name="KpiExplored" Text="0"
+                                                   FontSize="18" FontWeight="Bold"
+                                                   Foreground="#FFE101"/>
+                                        <TextBlock Text="HYPOTHESES EXPLORED" Classes="SLabel"/>
+                                    </StackPanel>
+                                </Border>
+                                <Border Grid.Column="2" Background="#0A0800"
+                                        BorderBrush="#2A2200" BorderThickness="1"
+                                        CornerRadius="4" Padding="12,8">
+                                    <StackPanel Spacing="2">
+                                        <TextBlock x:Name="KpiFDR" Text="—"
+                                                   FontSize="18" FontWeight="Bold"
+                                                   Foreground="#FFE101"/>
+                                        <TextBlock Text="EXPECTED FALSE DISCOVERIES AT 5% FDR" Classes="SLabel"/>
+                                    </StackPanel>
+                                </Border>
+                            </Grid>
+                            <TextBlock FontSize="11" Foreground="#3A4A5A" TextWrapping="Wrap">
+                                Apply deflated Sharpe ratio or FDR correction to all validated results.
+                            </TextBlock>
+                        </StackPanel>
+                    </Border>
+
+                    <!-- How to use -->
+                    <Border Background="#08090E" BorderBrush="#141820"
+                            BorderThickness="1" CornerRadius="6"
+                            Padding="18,14" Margin="0,0,0,16">
+                        <StackPanel Spacing="12">
+                            <TextBlock Text="WORKFLOW" Classes="SLabel" Margin="0,0,0,2"/>
+                            <StackPanel Spacing="9">
+                                <StackPanel Orientation="Horizontal" Spacing="10">
+                                    <Border Width="18" Height="18" Background="#101420"
+                                            CornerRadius="9">
+                                        <TextBlock Text="1" FontSize="9" FontWeight="Bold"
+                                                   Foreground="#FFE101"
+                                                   HorizontalAlignment="Center"
+                                                   VerticalAlignment="Center"/>
+                                    </Border>
+                                    <TextBlock FontSize="12" Foreground="#6070A0"
+                                               VerticalAlignment="Center">
+                                        Write a falsifiable hypothesis — a specific, testable claim
+                                    </TextBlock>
+                                </StackPanel>
+                                <StackPanel Orientation="Horizontal" Spacing="10">
+                                    <Border Width="18" Height="18" Background="#101420"
+                                            CornerRadius="9">
+                                        <TextBlock Text="2" FontSize="9" FontWeight="Bold"
+                                                   Foreground="#FFE101"
+                                                   HorizontalAlignment="Center"
+                                                   VerticalAlignment="Center"/>
+                                    </Border>
+                                    <TextBlock FontSize="12" Foreground="#6070A0"
+                                               VerticalAlignment="Center">
+                                        Define the exact signal before touching the data
+                                    </TextBlock>
+                                </StackPanel>
+                                <StackPanel Orientation="Horizontal" Spacing="10">
+                                    <Border Width="18" Height="18" Background="#101420"
+                                            CornerRadius="9">
+                                        <TextBlock Text="3" FontSize="9" FontWeight="Bold"
+                                                   Foreground="#FFE101"
+                                                   HorizontalAlignment="Center"
+                                                   VerticalAlignment="Center"/>
+                                    </Border>
+                                    <TextBlock FontSize="12" Foreground="#6070A0"
+                                               VerticalAlignment="Center">
+                                        Forward-test on out-of-sample data only
+                                    </TextBlock>
+                                </StackPanel>
+                                <StackPanel Orientation="Horizontal" Spacing="10">
+                                    <Border Width="18" Height="18" Background="#101420"
+                                            CornerRadius="9">
+                                        <TextBlock Text="4" FontSize="9" FontWeight="Bold"
+                                                   Foreground="#FFE101"
+                                                   HorizontalAlignment="Center"
+                                                   VerticalAlignment="Center"/>
+                                    </Border>
+                                    <TextBlock FontSize="12" Foreground="#6070A0"
+                                               VerticalAlignment="Center">
+                                        Apply deflated Sharpe / FDR — correct for exploration breadth
+                                    </TextBlock>
+                                </StackPanel>
+                                <StackPanel Orientation="Horizontal" Spacing="10">
+                                    <Border Width="18" Height="18" Background="#101420"
+                                            CornerRadius="9">
+                                        <TextBlock Text="5" FontSize="9" FontWeight="Bold"
+                                                   Foreground="#FFE101"
+                                                   HorizontalAlignment="Center"
+                                                   VerticalAlignment="Center"/>
+                                    </Border>
+                                    <TextBlock FontSize="12" Foreground="#6070A0"
+                                               VerticalAlignment="Center">
+                                        Log everything attempted — rejected ideas count against FDR
+                                    </TextBlock>
+                                </StackPanel>
+                            </StackPanel>
+                        </StackPanel>
+                    </Border>
+
+                    <!-- Empty state CTA -->
+                    <StackPanel x:Name="EmptyState"
+                                HorizontalAlignment="Center" Spacing="6"
+                                Margin="0,8,0,0">
+                        <TextBlock Text="No hypotheses yet."
+                                   FontSize="13" Foreground="#2A3240"
+                                   HorizontalAlignment="Center"/>
+                        <TextBlock Text="Click + NEW HYPOTHESIS in the sidebar to begin."
+                                   FontSize="11" Foreground="#1A2028"
+                                   HorizontalAlignment="Center"/>
+                    </StackPanel>
+
+                </StackPanel>
+
+                <!-- ── Detail panel ──────────────────────────────────────────── -->
+                <StackPanel x:Name="DetailPanel" IsVisible="False"
+                            Margin="36,28,36,28" Spacing="0">
+
+                    <!-- Breadcrumb -->
+                    <StackPanel Orientation="Horizontal" Spacing="6" Margin="0,0,0,16">
+                        <Button Classes="ActionBtn" Content="← REGISTRY"
+                                Click="OnBackToOverview"/>
+                        <TextBlock Text="/" FontSize="11" Foreground="#2A3240"
+                                   VerticalAlignment="Center"/>
+                        <TextBlock x:Name="DetailBreadcrumb"
+                                   FontSize="11" Foreground="#4A5568"
+                                   VerticalAlignment="Center"/>
+                    </StackPanel>
+
+                    <!-- Header -->
+                    <Grid ColumnDefinitions="*,Auto" Margin="0,0,0,18">
+                        <StackPanel Grid.Column="0" Spacing="6">
+                            <StackPanel Orientation="Horizontal" Spacing="10">
+                                <Border x:Name="DetailStatusBadge"
+                                        CornerRadius="3" Padding="7,3">
+                                    <TextBlock x:Name="DetailStatusLabel"
+                                               FontSize="9" FontWeight="Bold"/>
+                                </Border>
+                                <TextBlock x:Name="DetailSignalTypeLabel"
+                                           FontSize="11" Foreground="#3A4A5A"
+                                           VerticalAlignment="Center"/>
+                            </StackPanel>
+                            <TextBlock x:Name="DetailNameLabel"
+                                       FontSize="20" FontWeight="Bold"
+                                       Foreground="#EBFFFF" TextWrapping="Wrap"/>
+                            <TextBlock x:Name="DetailMeta"
+                                       FontSize="10" Foreground="#2A3A4A"/>
+                        </StackPanel>
+                        <StackPanel Grid.Column="1" Orientation="Horizontal"
+                                    Spacing="8" VerticalAlignment="Top">
+                            <Button Classes="ActionBtn" Content="EDIT"
+                                    Click="OnEditHypothesis"/>
+                            <Button Classes="ActionBtn" Content="CHANGE STATUS"
+                                    Click="OnChangeStatus"/>
+                        </StackPanel>
+                    </Grid>
+
+                    <!-- Structural reason -->
+                    <Border Background="#08090E" BorderBrush="#141820"
+                            BorderThickness="1" CornerRadius="6"
+                            Padding="16,14" Margin="0,0,0,10">
+                        <StackPanel Spacing="8">
+                            <TextBlock Text="WHY SHOULD THIS EDGE EXIST?" Classes="SLabel"/>
+                            <TextBlock x:Name="DetailStructuralReason"
+                                       Text="Not specified yet."
+                                       FontSize="12" Foreground="#6070A0"
+                                       TextWrapping="Wrap" LineHeight="18"/>
+                        </StackPanel>
+                    </Border>
+
+                    <!-- Signal definition -->
+                    <Border Background="#08090E" BorderBrush="#141820"
+                            BorderThickness="1" CornerRadius="6"
+                            Padding="16,14" Margin="0,0,0,10">
+                        <StackPanel Spacing="8">
+                            <TextBlock Text="SIGNAL DEFINITION" Classes="SLabel"/>
+                            <TextBlock x:Name="DetailSignalDef"
+                                       Text="Not defined yet."
+                                       FontSize="12" Foreground="#6070A0"
+                                       TextWrapping="Wrap" LineHeight="18"/>
+                        </StackPanel>
+                    </Border>
+
+                    <!-- Evaluation metrics -->
+                    <Border Background="#08090E" BorderBrush="#141820"
+                            BorderThickness="1" CornerRadius="6"
+                            Padding="16,14" Margin="0,0,0,10">
+                        <StackPanel Spacing="10">
+                            <TextBlock Text="EVALUATION" Classes="SLabel"/>
+                            <Grid x:Name="EvalGrid"
+                                  ColumnDefinitions="*,10,*,10,*,10,*"
+                                  IsVisible="False">
+                                <Border Grid.Column="0" Background="#060810"
+                                        BorderBrush="#0F1220" BorderThickness="1"
+                                        CornerRadius="4" Padding="10,8">
+                                    <StackPanel Spacing="2">
+                                        <TextBlock x:Name="EvalExpR" Text="—"
+                                                   FontSize="16" FontWeight="Bold"
+                                                   Foreground="#EBFFFF"/>
+                                        <TextBlock Text="EXPECTANCY R" Classes="SLabel"/>
+                                    </StackPanel>
+                                </Border>
+                                <Border Grid.Column="2" Background="#060810"
+                                        BorderBrush="#0F1220" BorderThickness="1"
+                                        CornerRadius="4" Padding="10,8">
+                                    <StackPanel Spacing="2">
+                                        <TextBlock x:Name="EvalWR" Text="—"
+                                                   FontSize="16" FontWeight="Bold"
+                                                   Foreground="#EBFFFF"/>
+                                        <TextBlock Text="WIN RATE" Classes="SLabel"/>
+                                    </StackPanel>
+                                </Border>
+                                <Border Grid.Column="4" Background="#060810"
+                                        BorderBrush="#0F1220" BorderThickness="1"
+                                        CornerRadius="4" Padding="10,8">
+                                    <StackPanel Spacing="2">
+                                        <TextBlock x:Name="EvalSharpe" Text="—"
+                                                   FontSize="16" FontWeight="Bold"
+                                                   Foreground="#EBFFFF"/>
+                                        <TextBlock Text="SHARPE" Classes="SLabel"/>
+                                    </StackPanel>
+                                </Border>
+                                <Border Grid.Column="6" Background="#060810"
+                                        BorderBrush="#0F1220" BorderThickness="1"
+                                        CornerRadius="4" Padding="10,8">
+                                    <StackPanel Spacing="2">
+                                        <TextBlock x:Name="EvalTStat" Text="—"
+                                                   FontSize="16" FontWeight="Bold"
+                                                   Foreground="#EBFFFF"/>
+                                        <TextBlock Text="T-STAT" Classes="SLabel"/>
+                                    </StackPanel>
+                                </Border>
+                            </Grid>
+                            <TextBlock x:Name="EvalNote"
+                                       FontSize="11" Foreground="#2A3240"
+                                       Text="No evaluation data yet. Tag trades with this hypothesis to begin forward testing."/>
+                        </StackPanel>
+                    </Border>
+
+                    <!-- Notes -->
+                    <Border Background="#08090E" BorderBrush="#141820"
+                            BorderThickness="1" CornerRadius="6"
+                            Padding="16,14">
+                        <StackPanel Spacing="8">
+                            <TextBlock Text="NOTES / AUDIT LOG" Classes="SLabel"/>
+                            <TextBlock x:Name="DetailNotes"
+                                       Text="No notes."
+                                       FontSize="12" Foreground="#6070A0"
+                                       TextWrapping="Wrap" LineHeight="18"/>
+                        </StackPanel>
+                    </Border>
+
+                </StackPanel>
+
+            </Grid>
+        </ScrollViewer>
+
+    </Grid>
+</UserControl>
