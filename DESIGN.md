@@ -40,9 +40,9 @@ four areas. Everything we build maps into one of them:
 | Domain | Owns | Status |
 | --- | --- | --- |
 | **Market Data** | Assets, prices, dividends, corporate actions, options, metadata | Prices/dividends/options/splits/metadata live (validated + gap-backfilled); merger & spinoff entry manual |
-| **Portfolio Data** | Portfolios, transactions, holdings, cash | Transactions→holdings + cash tracking live; accounts pending |
+| **Portfolio Data** | Portfolios, accounts, transactions, holdings, cash | Transactions→holdings + cash + accounts live; per-account P&L pending |
 | **Analytics** | Optimization runs & allocations, risk metrics | Schema + display live; compute engine pending |
-| **Reference Data** | Asset types, sectors, countries, currencies | Asset types populated on metadata download (`reference` repo); sectors/countries stored inline on `assets` for now |
+| **Reference Data** | Asset types, sectors, countries, currencies | Asset types seeded on init + populated on metadata download (`reference` repo); sectors/countries stored inline on `assets` for now |
 
 ---
 
@@ -124,6 +124,7 @@ goqu/
 │   ├── repositories/            #   per-domain SQL helpers (the repository layer)
 │   │   ├── __init__.py          #     facade re-exporting every public helper
 │   │   ├── assets.py            #     asset hub + company/sector metadata
+│   │   ├── accounts.py          #     brokerage accounts (CRUD) within a portfolio
 │   │   ├── reference.py         #     reference lookups (asset types)
 │   │   ├── market_data.py       #     daily prices + options cache + gap detection
 │   │   ├── income.py            #     dividends, income profile, received income
@@ -169,9 +170,10 @@ migrated at startup by `database.init_schema()`.
 | `corporate_actions` | Market | Splits/mergers/spinoffs/symbol changes · folded into `recompute_holdings` · `UNIQUE(asset_id, ex_date, action_type)` |
 | `option_contracts` | Market | Chain snapshots · `UNIQUE(asset_id, expiration, option_type, strike)` |
 | `portfolio` | Portfolio | |
-| `transactions` | Portfolio | **Source of truth** for positions |
+| `accounts` | Portfolio | Brokerage accounts within a portfolio · `UNIQUE(portfolio_id, name)` |
+| `transactions` | Portfolio | **Source of truth** for positions · optional `account_id` |
 | `holdings` | Portfolio | **Derived cache** · `UNIQUE(portfolio_id, asset_id)` |
-| `cash_transactions` | Portfolio | **Source of truth** for cash movements (deposits/withdrawals/interest/fees); balance is derived |
+| `cash_transactions` | Portfolio | **Source of truth** for cash movements (deposits/withdrawals/interest/fees); balance is derived · optional `account_id` |
 | `asset_income_profile` | Market | 1:1 income snapshot per asset (yield, rate) |
 | `dividend_income` | Portfolio | Realized income received (DRIP, tax) |
 | `optimization_runs` / `optimization_allocations` | Analytics | Displayed; not yet computed |
@@ -501,14 +503,20 @@ Shape (backward compatible — unspecified keys default):
 
 ## 10. Persistence, Migrations & Caching
 
-- **Startup:** `init_schema()` runs `_migrate()` then executes the idempotent
-  `CREATE TABLE IF NOT EXISTS` schema.
+- **Startup order:** `init_schema()` runs `_migrate()` (pre-schema drops) →
+  `CREATE TABLE IF NOT EXISTS` schema → `_migrate_add_columns()` (post-schema
+  `ALTER`s, so referenced tables like `accounts` already exist) →
+  `_seed_reference_data()`. All idempotent.
 - **Migrations for cache tables:** because `holdings` and `daily_price` are
   derived/refetchable, `_migrate()` detects a missing/legacy `UNIQUE` index
   (via `PRAGMA index_list`) and drops the table so the schema recreates it
   correctly — no data-copy migration needed.
 - **Structural changes to source-of-truth tables** (`transactions`, `portfolio`,
-  income) must use copy-preserving migrations — never drop.
+  `cash_transactions`, income) must preserve data — never drop. New *columns* use
+  `_migrate_add_columns` (`ALTER TABLE … ADD COLUMN`, nullable) — that's how
+  `account_id` was added to `transactions`/`cash_transactions` on existing DBs.
+- **Seed data:** `_seed_reference_data` populates standard `asset_type` rows via
+  `INSERT OR IGNORE` (idempotent against the `UNIQUE(name)` index).
 - **Connection settings:** `PRAGMA foreign_keys=ON`, `busy_timeout=5000`
   (tolerate concurrent background writes), `row_factory=Row`.
 
@@ -651,8 +659,11 @@ types are entered manually because no reliable feed exists.
   now holds only the connection factory, schema, and migrations. Next step here
   is the `models/` stubs becoming real domain types returned by the repos
   (today they still return plain dicts).
-- **Accounts & cash:** README's Phase 1/3 call for `accounts` and cash tracking;
-  neither exists yet. Needed before "recreate your brokerage exactly."
+- **Accounts & cash:** both shipped. Cash is a derived balance (§6.2); accounts
+  (`accounts` table + repo) are an optional ledger dimension on transactions/cash.
+  Remaining enhancement: **per-account holdings / value / P&L** (today holdings and
+  the cash balance are portfolio-aggregated, with account used for attribution and
+  filtering).
 - **Corporate actions:** splits/mergers/spinoffs/symbol changes are handled via
   `corporate_actions` + the `recompute_holdings` fold (ADR-007). Remaining work:
   a UI to record mergers/spinoffs; split-adjusting historical raw `daily_price`

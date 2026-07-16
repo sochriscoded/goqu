@@ -15,6 +15,7 @@ BUY = "buy"
 SELL = "sell"
 
 _EPS = 1e-9  # share residue below this counts as a closed position
+_UNSET = object()  # sentinel: "argument not provided" (distinct from None)
 
 
 # --- Portfolios ---
@@ -252,6 +253,7 @@ def record_transaction(
     price: float,
     fees: float = 0.0,
     notes: str = "",
+    account_id: int | None = None,
 ) -> int:
     """Record a single buy/sell. The ticker's asset row is created on demand."""
     asset_id = get_or_create_asset(symbol)
@@ -259,19 +261,21 @@ def record_transaction(
         cur = conn.execute(
             """
             INSERT INTO transactions
-                (portfolio_id, asset_id, date, transaction_type, shares, price, fees, notes)
-            VALUES (?, ?, ?, ?, ?, ?, ?, ?)
+                (portfolio_id, asset_id, account_id, date, transaction_type, shares, price, fees, notes)
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
             """,
-            (portfolio_id, asset_id, date, transaction_type, shares, price, fees, notes),
+            (portfolio_id, asset_id, account_id, date, transaction_type, shares, price, fees, notes),
         )
         txn_id = cur.lastrowid
     recompute_holdings(portfolio_id)  # keep the holdings cache in sync
     return txn_id
 
 
-def record_transactions_batch(portfolio_id: int, rows: list[dict]) -> int:
+def record_transactions_batch(portfolio_id: int, rows: list[dict],
+                              account_id: int | None = None) -> int:
     """Record many transactions in one commit. Each row needs symbol, date,
-    transaction_type, shares, price; fees and notes are optional. Returns the count.
+    transaction_type, shares, price; fees and notes are optional. All rows are
+    attributed to `account_id` (or a per-row 'account_id' if present). Returns the count.
     """
     count = 0
     with get_connection() as conn:
@@ -287,12 +291,13 @@ def record_transactions_batch(portfolio_id: int, rows: list[dict]) -> int:
             conn.execute(
                 """
                 INSERT INTO transactions
-                    (portfolio_id, asset_id, date, transaction_type, shares, price, fees, notes)
-                VALUES (?, ?, ?, ?, ?, ?, ?, ?)
+                    (portfolio_id, asset_id, account_id, date, transaction_type, shares, price, fees, notes)
+                VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
                 """,
                 (
-                    portfolio_id, asset_id, r["date"], r["transaction_type"],
-                    r["shares"], r["price"], r.get("fees", 0.0), r.get("notes", ""),
+                    portfolio_id, asset_id, r.get("account_id", account_id), r["date"],
+                    r["transaction_type"], r["shares"], r["price"],
+                    r.get("fees", 0.0), r.get("notes", ""),
                 ),
             )
             count += 1
@@ -308,9 +313,10 @@ def get_transactions(portfolio_id: int) -> list[dict]:
         rows = conn.execute(
             """
             SELECT t.id, t.date, t.transaction_type, t.shares, t.price, t.fees, t.notes,
-                   a.symbol, a.name
+                   a.symbol, a.name, t.account_id, ac.name AS account_name
               FROM transactions t
               JOIN assets a ON a.id = t.asset_id
+         LEFT JOIN accounts ac ON ac.id = t.account_id
              WHERE t.portfolio_id = ?
              ORDER BY t.date DESC, t.id DESC
             """,
@@ -327,7 +333,7 @@ def get_transaction(txn_id: int) -> dict | None:
         row = conn.execute(
             """
             SELECT t.id, t.portfolio_id, t.date, t.transaction_type, t.shares,
-                   t.price, t.fees, t.notes, a.symbol
+                   t.price, t.fees, t.notes, a.symbol, t.account_id
               FROM transactions t
               JOIN assets a ON a.id = t.asset_id
              WHERE t.id = ?
@@ -363,10 +369,12 @@ def update_transaction(
     price: float | None = None,
     fees: float | None = None,
     notes: str | None = None,
+    account_id: int | None = _UNSET,
 ) -> int | None:
     """Edit any subset of a transaction's fields, then rebuild holdings. Returns
     the affected portfolio_id, or None if it didn't exist. Changing `symbol`
-    re-points the row at that asset (created on demand)."""
+    re-points the row at that asset (created on demand). `account_id` uses a
+    sentinel default so passing `None` explicitly *unassigns* the account."""
     asset_id = get_or_create_asset(symbol) if symbol is not None else None
     with get_connection() as conn:
         row = conn.execute(
@@ -391,6 +399,8 @@ def update_transaction(
             fields["notes"] = notes
         if asset_id is not None:
             fields["asset_id"] = asset_id
+        if account_id is not _UNSET:
+            fields["account_id"] = account_id
 
         if fields:
             assignments = ", ".join(f"{k} = ?" for k in fields)

@@ -18,9 +18,9 @@ UI to exercise it — rather than strictly phase-by-phase. Snapshot:
 | Phase | Title | Status | One-line |
 | --- | --- | --- | --- |
 | 0 | Planning & Design | ✅ 100% | Complete — architecture, config, ERD, logging all done |
-| 1 | Database Layer | 🟢 ~95% | Schema + migrations + per-domain repositories done; seed data pending |
+| 1 | Database Layer | ✅ 100% | Schema + migrations + per-domain repositories + seed data all done |
 | 2 | Market Data | 🟢 ~90% | Downloader + caching + corporate actions + metadata + gap-backfill + validation; needs a symbol-entry UI |
-| 3 | Portfolio Management | 🟢 ~85% | Holdings/values/allocation + edit/delete + cash tracking done; **accounts** pending |
+| 3 | Portfolio Management | 🟢 ~95% | Holdings/values/allocation + edit/delete + cash + accounts done; per-account P&L is the polish item |
 | 4 | Analytics Engine | 🔴 ~5% | Metrics *displayed* but not *computed* |
 | 5 | Visualization | 🟡 ~25% | Dashboard shell done; no charts |
 | 6 | Portfolio Optimization | 🔴 0% | Tables exist; no optimizer |
@@ -59,17 +59,18 @@ all depend on it) → Phase 3 gaps (edit/delete, cash) in parallel.
 
 **Schema** — [x] Assets · [x] AssetTypes · [x] DailyPrices · [x] Portfolios ·
 [x] Transactions · [x] Holdings · [x] OptimizationRuns · [x] OptimizationAllocations
-· **[ ] Accounts** *(not yet — see Phase 3)*
+· **[x] Accounts**
 Beyond the original list we also added: dividends, asset_income_profile,
-dividend_income, option_contracts, risk_metrics, data_cache_meta.
+dividend_income, option_contracts, corporate_actions, cash_transactions,
+risk_metrics, data_cache_meta.
 
 **Data Access**
 - [x] SQLite connection (`get_connection`, FK on, busy_timeout)
 - [x] Repository layer — *per-domain repos in `data/repositories/` (assets, market_data, income, portfolios, analytics, cache_meta); `database.py` holds connection + schema + migrations*
 - [x] CRUD operations
 - [x] Database initialization (`init_schema`)
-- [x] Migration system (`_migrate`, index-aware cache-table rebuilds)
-- [ ] Seed data
+- [x] Migration system (`_migrate` cache rebuilds + `_migrate_add_columns` for `ALTER ADD COLUMN` on source-of-truth tables)
+- [x] Seed data — *`_seed_reference_data`: standard `asset_type` rows on init (idempotent)*
 
 **Deliverable:** `goqu.db` created automatically. ✅ (at `~/.config/goqu/`)
 
@@ -102,7 +103,7 @@ remaining gap is a **symbol-entry UI** to drive it)
 **Goal:** Represent real portfolios.
 
 - [x] Create portfolio
-- [ ] Create account — *no `accounts` table yet*
+- [x] Create account — *`accounts` table + `accounts` repo (CRUD); Accounts dialog + per-form selectors + account filter; transactions/cash carry an optional `account_id`*
 - [x] Add transactions (single + batch)
 - [x] Delete transactions — *`delete_transaction` + recompute; per-row button in the history*
 - [x] Edit transactions — *`update_transaction` + recompute; edit dialog from the history*
@@ -111,9 +112,10 @@ remaining gap is a **symbol-entry UI** to drive it)
 - [x] Compute allocation (weights per holding)
 - [x] Cash tracking — *`cash_transactions` + derived balance (`cash` repo): deposits/withdrawals/interest/fees + trade flows + non-DRIP dividends; Cash tab + dashboard Cash/Total Value tiles*
 
-**Deliverable:** recreate your brokerage portfolio exactly. ⏳ (edit/delete/cash
-done; the one remaining gap is **accounts** — grouping holdings/cash under
-brokerage accounts)
+**Deliverable:** recreate your brokerage portfolio exactly. ✅ (portfolios,
+transactions with edit/delete, holdings, cash, and accounts all in). Accounts are
+a ledger *dimension* today (attribution + filtering); **per-account holdings /
+value / P&L** is the natural next enhancement.
 
 > Note: edit/delete were cheap thanks to ADR-002 — mutate the ledger, then
 > `recompute_holdings()`; nothing FK-references `transactions`. Cash follows the

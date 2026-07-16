@@ -49,6 +49,21 @@ CREATE TABLE IF NOT EXISTS portfolio (
     FOREIGN KEY (benchmark_asset_id) REFERENCES assets(id)
 );
 
+-- Brokerage accounts within a portfolio (e.g. "Fidelity Taxable", "Vanguard
+-- Roth IRA"). Transactions and cash movements may be attributed to one; holdings
+-- and the cash balance stay portfolio-aggregated, with account as a ledger
+-- dimension. Source-of-truth (user data; never dropped).
+CREATE TABLE IF NOT EXISTS accounts (
+    id           INTEGER PRIMARY KEY AUTOINCREMENT,
+    portfolio_id INTEGER NOT NULL,
+    name         TEXT NOT NULL,
+    account_type TEXT NOT NULL DEFAULT 'taxable',  -- taxable|traditional_ira|roth_ira|401k|hsa|brokerage|other
+    institution  TEXT NOT NULL DEFAULT '',
+    created_at   DATETIME NOT NULL DEFAULT (datetime('now')),
+    FOREIGN KEY (portfolio_id) REFERENCES portfolio(id),
+    UNIQUE (portfolio_id, name)
+);
+
 -- Derived cache of current positions, rebuilt from transactions (never edited
 -- directly). One row per (portfolio, asset).
 CREATE TABLE IF NOT EXISTS holdings (
@@ -68,6 +83,7 @@ CREATE TABLE IF NOT EXISTS transactions (
     id               INTEGER PRIMARY KEY AUTOINCREMENT,
     portfolio_id     INTEGER NOT NULL,
     asset_id         INTEGER NOT NULL,
+    account_id       INTEGER,                 -- optional brokerage account
     date             DATE NOT NULL,
     transaction_type TEXT NOT NULL,
     shares           REAL NOT NULL,
@@ -75,7 +91,8 @@ CREATE TABLE IF NOT EXISTS transactions (
     fees             REAL NOT NULL DEFAULT 0.0,
     notes            TEXT NOT NULL DEFAULT '',
     FOREIGN KEY (portfolio_id) REFERENCES portfolio(id),
-    FOREIGN KEY (asset_id) REFERENCES assets(id)
+    FOREIGN KEY (asset_id) REFERENCES assets(id),
+    FOREIGN KEY (account_id) REFERENCES accounts(id)
 );
 
 CREATE TABLE IF NOT EXISTS daily_price (
@@ -209,12 +226,14 @@ CREATE INDEX IF NOT EXISTS idx_corporate_actions_asset
 CREATE TABLE IF NOT EXISTS cash_transactions (
     id           INTEGER PRIMARY KEY AUTOINCREMENT,
     portfolio_id INTEGER NOT NULL,
+    account_id   INTEGER,              -- optional brokerage account
     date         DATE NOT NULL,
     cash_type    TEXT NOT NULL,        -- deposit | withdrawal | interest | fee | adjustment
     amount       REAL NOT NULL,        -- signed cash delta
     notes        TEXT NOT NULL DEFAULT '',
     created_at   DATETIME NOT NULL DEFAULT (datetime('now')),
-    FOREIGN KEY (portfolio_id) REFERENCES portfolio(id)
+    FOREIGN KEY (portfolio_id) REFERENCES portfolio(id),
+    FOREIGN KEY (account_id) REFERENCES accounts(id)
 );
 CREATE INDEX IF NOT EXISTS idx_cash_txn_portfolio
     ON cash_transactions(portfolio_id, date);
@@ -277,8 +296,10 @@ def init_schema() -> None:
     _DB_DIR.mkdir(parents=True, exist_ok=True)
     conn = sqlite3.connect(DB_PATH)
     try:
-        _migrate(conn)
-        conn.executescript(_SCHEMA)  # CREATE TABLE IF NOT EXISTS — recreates dropped tables
+        _migrate(conn)                  # pre-schema: drop legacy cache tables
+        conn.executescript(_SCHEMA)     # CREATE TABLE IF NOT EXISTS (incl. accounts)
+        _migrate_add_columns(conn)      # post-schema: ALTER new columns onto existing tables
+        _seed_reference_data(conn)      # idempotent reference/lookup seed
         conn.commit()
     finally:
         conn.close()
@@ -305,6 +326,41 @@ def _migrate(conn: sqlite3.Connection) -> None:
     ):
         logger.info("Migrating: rebuilding 'daily_price' table (refetchable cache)")
         conn.execute("DROP TABLE daily_price")
+
+
+# Standard asset-type labels seeded on init (superset of the yfinance type map,
+# so metadata enrichment reuses these rows rather than creating duplicates).
+_STANDARD_ASSET_TYPES = [
+    "Equity", "ETF", "Mutual Fund", "Index", "Bond", "REIT",
+    "Crypto", "Currency", "Commodity", "Future", "Option",
+]
+
+
+def _migrate_add_columns(conn: sqlite3.Connection) -> None:
+    """Add columns onto source-of-truth tables that can't be dropped/recreated.
+
+    Runs *after* the schema so referenced tables (e.g. accounts) already exist.
+    `ALTER TABLE ADD COLUMN` is non-destructive and preserves existing rows."""
+    for table in ("transactions", "cash_transactions"):
+        _add_column_if_missing(conn, table, "account_id", "INTEGER REFERENCES accounts(id)")
+
+
+def _add_column_if_missing(conn: sqlite3.Connection, table: str, column: str, decl: str) -> None:
+    if not _table_exists(conn, table):
+        return
+    existing = [row[1] for row in conn.execute(f"PRAGMA table_info({table})").fetchall()]
+    if column not in existing:
+        logger.info("Migrating: adding column %s.%s", table, column)
+        conn.execute(f"ALTER TABLE {table} ADD COLUMN {column} {decl}")
+
+
+def _seed_reference_data(conn: sqlite3.Connection) -> None:
+    """Populate lookup tables with sensible defaults. Idempotent (INSERT OR
+    IGNORE against the UNIQUE(name) index), so it's safe on every startup."""
+    conn.executemany(
+        "INSERT OR IGNORE INTO asset_type (name) VALUES (?)",
+        [(name,) for name in _STANDARD_ASSET_TYPES],
+    )
 
 
 def _table_exists(conn: sqlite3.Connection, table: str) -> bool:

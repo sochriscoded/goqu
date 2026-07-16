@@ -36,27 +36,31 @@ def signed_amount(cash_type: str, magnitude: float) -> float:
 
 
 def record_cash_transaction(
-    portfolio_id: int, date: str, cash_type: str, amount: float, notes: str = ""
+    portfolio_id: int, date: str, cash_type: str, amount: float, notes: str = "",
+    account_id: int | None = None,
 ) -> int:
     """Insert a cash movement. `amount` is stored as a signed delta — derive it
     from a magnitude with `signed_amount(cash_type, magnitude)`."""
     with get_connection() as conn:
         cur = conn.execute(
-            "INSERT INTO cash_transactions (portfolio_id, date, cash_type, amount, notes) "
-            "VALUES (?, ?, ?, ?, ?)",
-            (portfolio_id, date, cash_type, amount, notes),
+            "INSERT INTO cash_transactions (portfolio_id, account_id, date, cash_type, amount, notes) "
+            "VALUES (?, ?, ?, ?, ?, ?)",
+            (portfolio_id, account_id, date, cash_type, amount, notes),
         )
         return cur.lastrowid
 
 
 def get_cash_transactions(portfolio_id: int) -> list[dict]:
-    """Cash movements for a portfolio, most recent first."""
+    """Cash movements for a portfolio, most recent first (with account name)."""
     if not DB_PATH.exists():
         return []
     with get_connection() as conn:
         rows = conn.execute(
-            "SELECT id, date, cash_type, amount, notes FROM cash_transactions "
-            "WHERE portfolio_id = ? ORDER BY date DESC, id DESC",
+            "SELECT c.id, c.date, c.cash_type, c.amount, c.notes, "
+            "       c.account_id, ac.name AS account_name "
+            "  FROM cash_transactions c "
+            "  LEFT JOIN accounts ac ON ac.id = c.account_id "
+            " WHERE c.portfolio_id = ? ORDER BY c.date DESC, c.id DESC",
             (portfolio_id,),
         ).fetchall()
         return [dict(r) for r in rows]

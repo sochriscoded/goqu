@@ -4,6 +4,7 @@ Each module owns the SQL for one domain (DESIGN §2's four data domains plus
 infra), importing the connection factory from `data.database`:
 
 - `assets`            — the market asset hub + company/sector metadata
+- `accounts`          — brokerage accounts within a portfolio
 - `reference`         — reference lookups (asset types)
 - `market_data`       — refetchable price & options cache + gap detection
 - `income`            — dividend sleeve (declared, profile, received)
@@ -21,6 +22,14 @@ while domain-scoped callers can import the specific module they depend on.
 from data.repositories.analytics import (
     get_latest_optimization,
     get_latest_risk_metrics,
+)
+from data.repositories.accounts import (
+    ACCOUNT_TYPES,
+    create_account,
+    delete_account,
+    get_account,
+    list_accounts,
+    update_account,
 )
 from data.repositories.assets import (
     get_asset,
@@ -93,6 +102,7 @@ from data.repositories.portfolios import (
 )
 
 __all__ = [
+    "ACCOUNT_TYPES",
     "ADJUSTMENT",
     "BUY",
     "CASH_TYPES",
@@ -105,10 +115,13 @@ __all__ = [
     "cache_mark",
     "compute_missing_ranges",
     "compute_positions",
+    "create_account",
     "create_portfolio",
     "daily_gaps",
+    "delete_account",
     "delete_cash_transaction",
     "delete_transaction",
+    "get_account",
     "get_actions_for_assets",
     "get_asset",
     "get_asset_by_symbol",
@@ -132,6 +145,7 @@ __all__ = [
     "get_portfolio",
     "get_transaction",
     "get_transactions",
+    "list_accounts",
     "list_asset_types",
     "list_corporate_actions",
     "list_portfolios",
@@ -149,6 +163,7 @@ __all__ = [
     "recompute_holdings",
     "recompute_portfolios_holding_asset",
     "signed_amount",
+    "update_account",
     "update_asset_metadata",
     "update_transaction",
     "upsert_daily_prices",

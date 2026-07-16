@@ -6,6 +6,12 @@ sys.path.insert(0, os.path.join(os.path.dirname(__file__), ".."))
 from PySide6 import QtCore, QtWidgets
 from PySide6.QtCore import Signal
 from data.repositories import cash as cashrepo
+from data.repositories.accounts import (
+    ACCOUNT_TYPES,
+    create_account,
+    delete_account,
+    list_accounts,
+)
 from data.repositories.portfolios import (
     BUY,
     SELL,
@@ -18,6 +24,10 @@ from data.repositories.portfolios import (
     update_transaction,
 )
 from ui import theme
+
+# Account-filter sentinels (combo item data).
+_FILTER_ALL = "__all__"
+_FILTER_UNASSIGNED = "__unassigned__"
 
 
 def _fmt_money(value) -> str:
@@ -61,7 +71,7 @@ def _section_label(text: str) -> QtWidgets.QLabel:
 class _TransactionDialog(QtWidgets.QDialog):
     """Edit an existing buy/sell, prefilled from a transaction dict."""
 
-    def __init__(self, parent, txn: dict):
+    def __init__(self, parent, txn: dict, accounts: list[dict]):
         super().__init__(parent)
         self.setWindowTitle("Edit Transaction")
         self.setMinimumWidth(360)
@@ -103,6 +113,15 @@ class _TransactionDialog(QtWidgets.QDialog):
         self._fees.setValue(txn["fees"])
         form.addRow("Fees", self._fees)
 
+        self._account = QtWidgets.QComboBox()
+        self._account.addItem("— No account —", None)
+        for account in accounts:
+            self._account.addItem(account["name"], account["id"])
+        acct_idx = self._account.findData(txn.get("account_id"))
+        if acct_idx >= 0:
+            self._account.setCurrentIndex(acct_idx)
+        form.addRow("Account", self._account)
+
         self._notes = QtWidgets.QLineEdit(txn.get("notes", ""))
         form.addRow("Notes", self._notes)
         layout.addLayout(form)
@@ -123,7 +142,114 @@ class _TransactionDialog(QtWidgets.QDialog):
             "price": self._price.value(),
             "fees": self._fees.value(),
             "notes": self._notes.text().strip(),
+            "account_id": self._account.currentData(),
         }
+
+
+class AccountsDialog(QtWidgets.QDialog):
+    """Create, view, and delete the brokerage accounts of a portfolio."""
+
+    def __init__(self, parent, portfolio_id: int):
+        super().__init__(parent)
+        self._portfolio_id = portfolio_id
+        self.setWindowTitle("Manage Accounts")
+        self.setMinimumWidth(480)
+        self.setModal(True)
+
+        layout = QtWidgets.QVBoxLayout(self)
+        layout.setContentsMargins(20, 20, 20, 20)
+        layout.setSpacing(14)
+
+        self._list = QtWidgets.QTableWidget()
+        self._list.setColumnCount(4)
+        self._list.setHorizontalHeaderLabels(["Name", "Type", "Institution", ""])
+        self._list.horizontalHeader().setStretchLastSection(False)
+        self._list.setEditTriggers(QtWidgets.QAbstractItemView.NoEditTriggers)
+        self._list.setSelectionBehavior(QtWidgets.QAbstractItemView.SelectRows)
+        self._list.verticalHeader().setVisible(False)
+        layout.addWidget(self._list)
+
+        layout.addWidget(_section_label("Add Account"))
+        form = QtWidgets.QFormLayout()
+        form.setSpacing(10)
+        form.setLabelAlignment(QtCore.Qt.AlignRight)
+        self._name = QtWidgets.QLineEdit()
+        self._name.setPlaceholderText("e.g., Fidelity Taxable")
+        form.addRow("Name *", self._name)
+        self._type = QtWidgets.QComboBox()
+        for value, label in ACCOUNT_TYPES.items():
+            self._type.addItem(label, value)
+        form.addRow("Type", self._type)
+        self._institution = QtWidgets.QLineEdit()
+        self._institution.setPlaceholderText("e.g., Fidelity  (optional)")
+        form.addRow("Institution", self._institution)
+        layout.addLayout(form)
+
+        add_row = QtWidgets.QHBoxLayout()
+        add_row.addStretch()
+        add_btn = QtWidgets.QPushButton("Add Account")
+        add_btn.setObjectName("PrimaryButton")
+        add_btn.clicked.connect(self._add)
+        add_row.addWidget(add_btn)
+        layout.addLayout(add_row)
+
+        close_box = QtWidgets.QDialogButtonBox(QtWidgets.QDialogButtonBox.Close)
+        close_box.rejected.connect(self.reject)
+        close_box.accepted.connect(self.accept)
+        layout.addWidget(close_box)
+
+        self._reload()
+
+    def _reload(self):
+        accounts = list_accounts(self._portfolio_id)
+        self._list.setRowCount(len(accounts))
+        for r, a in enumerate(accounts):
+            self._list.setItem(r, 0, QtWidgets.QTableWidgetItem(a["name"]))
+            self._list.setItem(
+                r, 1, QtWidgets.QTableWidgetItem(ACCOUNT_TYPES.get(a["account_type"], a["account_type"]))
+            )
+            self._list.setItem(r, 2, QtWidgets.QTableWidgetItem(a["institution"]))
+            holder = QtWidgets.QWidget()
+            box = QtWidgets.QHBoxLayout(holder)
+            box.setContentsMargins(4, 0, 4, 0)
+            delete = QtWidgets.QPushButton("Delete")
+            delete.setObjectName("LinkButton")
+            delete.setCursor(QtCore.Qt.PointingHandCursor)
+            delete.clicked.connect(lambda _=False, i=a["id"]: self._delete(i))
+            box.addWidget(delete)
+            self._list.setCellWidget(r, 3, holder)
+        self._list.resizeColumnsToContents()
+        self._list.horizontalHeader().setSectionResizeMode(0, QtWidgets.QHeaderView.Stretch)
+        self._list.setColumnWidth(3, 90)
+
+    def _add(self):
+        name = self._name.text().strip()
+        if not name:
+            QtWidgets.QMessageBox.warning(self, "Required", "Account name cannot be empty.")
+            self._name.setFocus()
+            return
+        try:
+            create_account(
+                self._portfolio_id, name, self._type.currentData(),
+                self._institution.text().strip(),
+            )
+        except Exception as e:  # e.g. duplicate name (UNIQUE portfolio,name)
+            QtWidgets.QMessageBox.warning(self, "Could not add account", str(e))
+            return
+        self._name.clear()
+        self._institution.clear()
+        self._reload()
+
+    def _delete(self, account_id: int):
+        confirm = QtWidgets.QMessageBox.question(
+            self, "Delete account?",
+            "Delete this account? Its transactions and cash are kept but become "
+            "unassigned.",
+        )
+        if confirm != QtWidgets.QMessageBox.Yes:
+            return
+        delete_account(account_id)
+        self._reload()
 
 
 class TransactionsView(QtWidgets.QWidget):
@@ -135,7 +261,7 @@ class TransactionsView(QtWidgets.QWidget):
     COL_TICKER, COL_DATE, COL_SHARES, COL_PRICE, COL_FEES, COL_REMOVE = range(6)
     # Trade-history columns (Symbol stretches; Actions holds edit/delete buttons)
     COL_TXN_SYMBOL = 2
-    COL_TXN_ACTIONS = 7
+    COL_TXN_ACTIONS = 8
 
     def __init__(self, parent=None):
         super().__init__(parent)
@@ -153,9 +279,19 @@ class TransactionsView(QtWidgets.QWidget):
 
         header.addWidget(_section_label("Portfolio"))
         self._portfolio_combo = QtWidgets.QComboBox()
-        self._portfolio_combo.setMinimumWidth(220)
+        self._portfolio_combo.setMinimumWidth(200)
         self._portfolio_combo.currentIndexChanged.connect(self._on_portfolio_changed)
         header.addWidget(self._portfolio_combo)
+
+        header.addWidget(_section_label("Account"))
+        self._account_filter = QtWidgets.QComboBox()
+        self._account_filter.setMinimumWidth(150)
+        self._account_filter.currentIndexChanged.connect(self._on_account_filter_changed)
+        header.addWidget(self._account_filter)
+
+        self._manage_accounts_btn = QtWidgets.QPushButton("Accounts…")
+        self._manage_accounts_btn.clicked.connect(self._open_accounts_dialog)
+        header.addWidget(self._manage_accounts_btn)
         root.addLayout(header)
 
         # --- Body: swaps between "no portfolios" and the real content ---
@@ -195,9 +331,9 @@ class TransactionsView(QtWidgets.QWidget):
 
         layout.addWidget(_section_label("Recent Transactions"))
         self._history = QtWidgets.QTableWidget()
-        self._history.setColumnCount(8)
+        self._history.setColumnCount(9)
         self._history.setHorizontalHeaderLabels(
-            ["Date", "Type", "Symbol", "Shares", "Price", "Fees", "Net Cash", ""]
+            ["Date", "Type", "Symbol", "Account", "Shares", "Price", "Fees", "Net Cash", ""]
         )
         header = self._history.horizontalHeader()
         header.setStretchLastSection(False)
@@ -241,6 +377,9 @@ class TransactionsView(QtWidgets.QWidget):
         self._single_fees = _money_spin()
         form.addRow("Fees", self._single_fees)
 
+        self._single_account = QtWidgets.QComboBox()
+        form.addRow("Account", self._single_account)
+
         self._single_notes = QtWidgets.QLineEdit()
         self._single_notes.setPlaceholderText("Optional")
         form.addRow("Notes", self._single_notes)
@@ -271,6 +410,10 @@ class TransactionsView(QtWidgets.QWidget):
         self._batch_type.addItem("Buy", BUY)
         self._batch_type.addItem("Sell", SELL)
         top.addWidget(self._batch_type)
+        top.addWidget(_section_label("Account"))
+        self._batch_account = QtWidgets.QComboBox()
+        self._batch_account.setMinimumWidth(150)
+        top.addWidget(self._batch_account)
         top.addStretch()
         add_btn = QtWidgets.QPushButton("+ Add Row")
         add_btn.clicked.connect(lambda: self._add_batch_row())
@@ -300,9 +443,9 @@ class TransactionsView(QtWidgets.QWidget):
         outer.addLayout(btn_row)
         return tab
 
-    # Cash-history columns
-    COL_CASH_NOTES = 3
-    COL_CASH_ACTIONS = 4
+    # Cash-history columns (Notes stretches; Actions holds the delete button)
+    COL_CASH_NOTES = 4
+    COL_CASH_ACTIONS = 5
 
     def _build_cash_tab(self) -> QtWidgets.QWidget:
         tab = QtWidgets.QWidget()
@@ -332,6 +475,8 @@ class TransactionsView(QtWidgets.QWidget):
         form.addRow("Amount *", self._cash_amount)
         self._cash_date = _date_edit()
         form.addRow("Date", self._cash_date)
+        self._cash_account = QtWidgets.QComboBox()
+        form.addRow("Account", self._cash_account)
         self._cash_notes = QtWidgets.QLineEdit()
         self._cash_notes.setPlaceholderText("Optional")
         form.addRow("Notes", self._cash_notes)
@@ -348,9 +493,9 @@ class TransactionsView(QtWidgets.QWidget):
         # Cash history
         outer.addWidget(_section_label("Cash History"))
         self._cash_history = QtWidgets.QTableWidget()
-        self._cash_history.setColumnCount(5)
+        self._cash_history.setColumnCount(6)
         self._cash_history.setHorizontalHeaderLabels(
-            ["Date", "Type", "Amount", "Notes", ""]
+            ["Date", "Type", "Account", "Amount", "Notes", ""]
         )
         ch = self._cash_history.horizontalHeader()
         ch.setStretchLastSection(False)
@@ -371,13 +516,16 @@ class TransactionsView(QtWidgets.QWidget):
         self._cash_balance.setText(_fmt_money(balance))
         theme.set_pl_property(self._cash_balance, theme.pl_kind(balance))
 
-        rows = cashrepo.get_cash_transactions(portfolio_id)
+        keep = self._account_predicate()
+        rows = [c for c in cashrepo.get_cash_transactions(portfolio_id) if keep(c)]
         self._cash_history.setRowCount(len(rows))
         for r, c in enumerate(rows):
             amount = c["amount"]
             cells = [
                 (str(c["date"]), None, QtCore.Qt.AlignLeft),
                 (c["cash_type"].capitalize(), None, QtCore.Qt.AlignLeft),
+                (c["account_name"] or "—", theme.muted() if not c["account_name"] else None,
+                 QtCore.Qt.AlignLeft),
                 (_fmt_money(amount), theme.gain() if amount >= 0 else theme.loss(),
                  QtCore.Qt.AlignRight),
                 (c.get("notes", ""), None, QtCore.Qt.AlignLeft),
@@ -424,6 +572,7 @@ class TransactionsView(QtWidgets.QWidget):
             cash_type,
             cashrepo.signed_amount(cash_type, magnitude),
             self._cash_notes.text().strip(),
+            account_id=self._cash_account.currentData(),
         )
         self._cash_amount.setValue(0)
         self._cash_notes.clear()
@@ -486,6 +635,7 @@ class TransactionsView(QtWidgets.QWidget):
         self._portfolio_combo.blockSignals(False)
 
         self._stack.setCurrentIndex(1)
+        self._reload_accounts()
         self._reload_history()
         self._reload_cash()
 
@@ -495,6 +645,57 @@ class TransactionsView(QtWidgets.QWidget):
         return self._portfolio_combo.currentData()
 
     def _on_portfolio_changed(self, _index: int):
+        self._reload_accounts()
+        self._reload_history()
+        self._reload_cash()
+
+    # ---------- accounts ----------
+
+    def _reload_accounts(self):
+        """Repopulate every account combo (entry selectors + header filter) from
+        the current portfolio's accounts, preserving selections where possible."""
+        portfolio_id = self._current_portfolio_id()
+        accounts = list_accounts(portfolio_id) if portfolio_id is not None else []
+        for combo in (self._single_account, self._batch_account, self._cash_account):
+            self._fill_account_combo(combo, accounts, is_filter=False)
+        self._fill_account_combo(self._account_filter, accounts, is_filter=True)
+
+    @staticmethod
+    def _fill_account_combo(combo: QtWidgets.QComboBox, accounts: list[dict], *, is_filter: bool):
+        previous = combo.currentData()
+        combo.blockSignals(True)
+        combo.clear()
+        if is_filter:
+            combo.addItem("All accounts", _FILTER_ALL)
+            combo.addItem("Unassigned", _FILTER_UNASSIGNED)
+        else:
+            combo.addItem("— No account —", None)
+        for account in accounts:
+            combo.addItem(account["name"], account["id"])
+        idx = combo.findData(previous)
+        combo.setCurrentIndex(idx if idx >= 0 else 0)
+        combo.blockSignals(False)
+
+    def _account_predicate(self):
+        """Row filter from the header account selector (applies to both histories)."""
+        data = self._account_filter.currentData() if hasattr(self, "_account_filter") else _FILTER_ALL
+        if data == _FILTER_UNASSIGNED:
+            return lambda row: row["account_id"] is None
+        if isinstance(data, int):
+            return lambda row: row["account_id"] == data
+        return lambda row: True
+
+    def _on_account_filter_changed(self, _index: int):
+        self._reload_history()
+        self._reload_cash()
+
+    def _open_accounts_dialog(self):
+        portfolio_id = self._current_portfolio_id()
+        if portfolio_id is None:
+            return
+        AccountsDialog(self, portfolio_id).exec()
+        # Accounts may have been added/removed — refresh selectors + histories.
+        self._reload_accounts()
         self._reload_history()
         self._reload_cash()
 
@@ -502,7 +703,8 @@ class TransactionsView(QtWidgets.QWidget):
         portfolio_id = self._current_portfolio_id()
         if portfolio_id is None:
             return
-        txns = get_transactions(portfolio_id)
+        keep = self._account_predicate()
+        txns = [t for t in get_transactions(portfolio_id) if keep(t)]
         self._history.setRowCount(len(txns))
         for r, t in enumerate(txns):
             is_buy = t["transaction_type"] == BUY
@@ -513,6 +715,7 @@ class TransactionsView(QtWidgets.QWidget):
                 (str(t["date"]), None, QtCore.Qt.AlignLeft),
                 (t["transaction_type"].upper(), theme.gain() if is_buy else theme.loss(), QtCore.Qt.AlignLeft),
                 (t["symbol"], None, QtCore.Qt.AlignLeft),
+                (t["account_name"] or "—", theme.muted() if not t["account_name"] else None, QtCore.Qt.AlignLeft),
                 (f"{t['shares']:,.4f}".rstrip("0").rstrip("."), None, QtCore.Qt.AlignRight),
                 (_fmt_money(t["price"]), None, QtCore.Qt.AlignRight),
                 (_fmt_money(t["fees"]), None, QtCore.Qt.AlignRight),
@@ -558,7 +761,7 @@ class TransactionsView(QtWidgets.QWidget):
         txn = get_transaction(txn_id)
         if txn is None:
             return
-        dialog = _TransactionDialog(self, txn)
+        dialog = _TransactionDialog(self, txn, list_accounts(txn["portfolio_id"]))
         if dialog.exec() != QtWidgets.QDialog.Accepted:
             return
         values = dialog.values()
@@ -614,6 +817,7 @@ class TransactionsView(QtWidgets.QWidget):
             price=price,
             fees=self._single_fees.value(),
             notes=self._single_notes.text().strip(),
+            account_id=self._single_account.currentData(),
         )
         # Reset the entry fields for the next record
         self._single_ticker.clear()
@@ -661,7 +865,9 @@ class TransactionsView(QtWidgets.QWidget):
             self._warn("Add at least one transaction row.")
             return
 
-        count = record_transactions_batch(portfolio_id, rows)
+        count = record_transactions_batch(
+            portfolio_id, rows, account_id=self._batch_account.currentData()
+        )
 
         # Reset to a fresh set of blank rows
         self._batch_table.setRowCount(0)
